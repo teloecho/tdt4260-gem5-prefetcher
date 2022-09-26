@@ -1,0 +1,16 @@
+import sys
+
+Import('*')
+
+SimObject('TDT4260Cache.py', sim_objects=['BaseCacheHierarchy'])
+
+Source('cache_hierarchy.cc')
+Source('cache_interconnect.cc')
+Source('simple_cache.cc')
+Source('simple_mem.cc')
+
+DebugFlag('AllAddr')
+DebugFlag('AllCacheLines')
+DebugFlag('TDTSimpleCache')
+
+

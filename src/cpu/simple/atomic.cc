@@ -82,7 +82,7 @@ AtomicSimpleCPU::AtomicSimpleCPU(const BaseAtomicSimpleCPUParams &p)
       icachePort(name() + ".icache_port", this),
       dcachePort(name() + ".dcache_port", this),
       dcache_access(false), dcache_latency(0),
-      ppCommit(nullptr)
+      ppCommit(nullptr), cacheHierarchy(p.cache_hierarchy)
 {
     _status = Idle;
     ifetch_req = std::make_shared<Request>();
@@ -269,6 +269,14 @@ AtomicSimpleCPU::suspendContext(ThreadID thread_num)
     BaseCPU::suspendContext(thread_num);
 }
 
+void
+AtomicSimpleCPU::sendToCacheHierarchy(const PacketPtr &pkt)
+{
+    if (cacheHierarchy && (pkt->isRead() || pkt->isWrite())) {
+        cacheHierarchy->recvReq(pkt->getAddr(), pkt->getSize());
+    }
+}
+
 Tick
 AtomicSimpleCPU::sendPacket(RequestPort &port, const PacketPtr &pkt)
 {
@@ -402,6 +410,7 @@ AtomicSimpleCPU::readMem(Addr addr, uint8_t *data, unsigned size,
             if (req->isLocalAccess()) {
                 dcache_latency += req->localAccessor(thread->getTC(), &pkt);
             } else {
+                sendToCacheHierarchy(&pkt);
                 dcache_latency += sendPacket(dcachePort, &pkt);
             }
             dcache_access = true;
@@ -503,6 +512,7 @@ AtomicSimpleCPU::writeMem(uint8_t *data, unsigned size, Addr addr,
                     dcache_latency +=
                         req->localAccessor(thread->getTC(), &pkt);
                 } else {
+                    sendToCacheHierarchy(&pkt);
                     dcache_latency += sendPacket(dcachePort, &pkt);
 
                     // Notify other threads on this CPU of write
@@ -593,6 +603,7 @@ AtomicSimpleCPU::amoMem(Addr addr, uint8_t* data, unsigned size,
         if (req->isLocalAccess()) {
             dcache_latency += req->localAccessor(thread->getTC(), &pkt);
         } else {
+            sendToCacheHierarchy(&pkt);
             dcache_latency += sendPacket(dcachePort, &pkt);
         }
 

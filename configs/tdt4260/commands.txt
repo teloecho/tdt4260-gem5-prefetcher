@@ -1,0 +1,4 @@
+./gcc_s gcc-pp.c -O5 -fipa-pta -o gcc-pp.opts-O5_-fipa-pta.s ;55100000000
+./exchange2_s 6 ;33100000000
+./mcf_s inp.in  ;25600000000
+./deepsjeng_s ref.txt ;24400000000

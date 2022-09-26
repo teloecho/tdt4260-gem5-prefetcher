@@ -665,6 +665,7 @@ def run(options, root, testsys, cpu_class):
         elif cpu_class and options.fast_forward:
             print("Switch at instruction count:%s" %
                     str(testsys.cpu[0].max_insts_any_thread))
+            print("Current  cpu is", testsys.cpu[0])
             exit_event = m5.simulate()
         else:
             print("Switch at curTick count:%s" % str(10000))

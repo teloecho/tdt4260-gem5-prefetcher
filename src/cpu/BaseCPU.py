@@ -47,7 +47,7 @@ from m5.proxy import *
 from m5.util.fdthelper import *
 
 from m5.objects.ClockedObject import ClockedObject
-from m5.objects.XBar import L2XBar
+from m5.objects.XBar import L2XBar, L3XBar
 from m5.objects.InstTracer import InstTracer
 from m5.objects.CPUTracers import ExeTracer
 from m5.objects.SubSystem import SubSystem

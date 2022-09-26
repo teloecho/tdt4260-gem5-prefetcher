@@ -107,6 +107,8 @@ style_ignores = [
     # Ignore test data, as they are not code
     _re_ignore("^tests/(?:quick|long)/"),
     _re_ignore("^tests/test-progs/hello/bin/"),
+    _re_ignore("^src/tdt4260/"),
+    _re_ignore("^configs/tdt4260/"),
     # Only include Scons files and those with extensions that suggest source
     # code
     _re_only("^((.*\/)?(SConscript|SConstruct)|"

@@ -39,6 +39,7 @@
 from m5.params import *
 from m5.objects.BaseSimpleCPU import BaseSimpleCPU
 from m5.objects.SimPoint import SimPoint
+from m5.objects.TDT4260Cache import BaseCacheHierarchy
 
 class BaseAtomicSimpleCPU(BaseSimpleCPU):
     """Simple CPU model executing a configurable number of
@@ -60,6 +61,8 @@ class BaseAtomicSimpleCPU(BaseSimpleCPU):
     width = Param.Int(1, "CPU width")
     simulate_data_stalls = Param.Bool(False, "Simulate dcache stall cycles")
     simulate_inst_stalls = Param.Bool(False, "Simulate icache stall cycles")
+
+    cache_hierarchy = Param.BaseCacheHierarchy(NULL, "May be null")
 
     def addSimPointProbe(self, interval):
         simpoint = SimPoint()

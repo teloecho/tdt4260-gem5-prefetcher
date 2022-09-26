@@ -167,6 +167,18 @@ class L2XBar(CoherentXBar):
     # to the first level of unified cache.
     point_of_unification = True
 
+class L3XBar(CoherentXBar):
+    width = 64
+
+    frontend_latency = 1
+    forward_latency = 0
+    response_latency = 1
+    snoop_response_latency = 1
+
+    snoop_filter = SnoopFilter(lookup_latency = 0)
+
+    point_of_unification = False
+
 # One of the key coherent crossbar instances is the system
 # interconnect, tying together the CPU clusters, GPUs, and any I/O
 # coherent requestors, and DRAM controllers.

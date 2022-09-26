@@ -141,6 +141,7 @@ def addNoISAOptions(parser):
                         help="use external port for SystemC TLM cosimulation")
     parser.add_argument("--caches", action="store_true")
     parser.add_argument("--l2cache", action="store_true")
+    parser.add_argument("--l3cache", action="store_true")
     parser.add_argument("--num-dirs", type=int, default=1)
     parser.add_argument("--num-l2caches", type=int, default=1)
     parser.add_argument("--num-l3caches", type=int, default=1)
@@ -236,6 +237,11 @@ def addCommonOptions(parser):
                         type of hardware prefetcher to use with the L2 cache.
                         (if not set, use the default prefetcher of
                         the selected cache)""")
+    parser.add_argument("--l3-hwp-type", default=None,
+                        choices=ObjectList.hwp_list.get_names(),
+                        help="""
+                        type of hardware prefetcher to use with the L3 cache.
+                        """)
     parser.add_argument("--checker", action="store_true")
     parser.add_argument("--cpu-clock", action="store", type=str,
                         default='2GHz',
@@ -408,6 +414,8 @@ def addCommonOptions(parser):
         "once with: system.cpu[:].mmu. If given multiple times, dump stats "
         "that are present under any of the roots. If not given, dump all "
         "stats. ")
+    parser.add_argument("--iteration", action="store", type=int, default=None,
+        help="Current iteration of runs for prefetcher")
 
 
 def addSEOptions(parser):

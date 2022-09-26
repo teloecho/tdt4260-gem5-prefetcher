@@ -46,6 +46,7 @@
 #include "mem/request.hh"
 #include "params/BaseAtomicSimpleCPU.hh"
 #include "sim/probe/probe.hh"
+#include "tdt4260/cache_lab/cache_impl/cache_hierarchy.hh"
 
 namespace gem5
 {
@@ -103,6 +104,7 @@ class AtomicSimpleCPU : public BaseSimpleCPU
      */
     bool tryCompleteDrain();
 
+    void sendToCacheHierarchy(const PacketPtr &pkt);
     virtual Tick sendPacket(RequestPort &port, const PacketPtr &pkt);
     virtual Tick fetchInstMem();
 
@@ -172,6 +174,8 @@ class AtomicSimpleCPU : public BaseSimpleCPU
 
     /** Probe Points. */
     ProbePointArg<std::pair<SimpleThread *, const StaticInstPtr>> *ppCommit;
+
+    CacheHierarchy *cacheHierarchy = nullptr;
 
   protected:
 
