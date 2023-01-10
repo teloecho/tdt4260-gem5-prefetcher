@@ -74,14 +74,15 @@ SimpleCache::recvResp(Addr resp)
     DPRINTF(TDTSimpleCache, "Miss: Replaced way: %d\n", way);
     // TODO: Direct-Mapped: Record new cache line in entries
 
+    // TODO: Associative: Record LRU info for new line in entries
     sendResp(resp);
 }
 
 int
 SimpleCache::calculateTag(Addr req)
 {
-    // TODO: Direct-Mapped: Calculate index
-    // hint: req >> std::log2(...
+    // TODO: Direct-Mapped: Calculate tag
+    // hint: req >> ((int)std::log2(...
 
     return req;
 }
@@ -97,6 +98,7 @@ bool
 SimpleCache::hasLine(int index, int tag)
 {
     // TODO: Direct-Mapped: Check if line is already in cache
+    // TODO: Associative: Check all possible ways
     return false;
 }
 
