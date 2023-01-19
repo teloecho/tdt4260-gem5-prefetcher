@@ -14,7 +14,7 @@ class Benchmark:
 benchmarks = []
 
 with open(f"{path}/commands.txt", "r") as commands:
-    lines = commands.read().split("\n")[:-1]
+    lines = commands.read().split("\n")
     for command in lines:
         bin = command.split(" ", 1)[0][2:]
         opt = command.split(" ", 1)[1].split(";")[0]
