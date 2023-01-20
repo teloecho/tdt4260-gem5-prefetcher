@@ -33,5 +33,4 @@ configs/dram/lowp_sweep.cfg
 .pyenv
 .vscode
 src/tdt4260/prefetcher/spec2017/prefetcher*
-src/tdt4260/prefetcher/results/*
 src/tdt4260/prefetcher/spec2017/spec2017_cpts/*

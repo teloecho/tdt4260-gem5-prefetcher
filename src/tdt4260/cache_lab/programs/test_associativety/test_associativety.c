@@ -10,6 +10,7 @@
 // arcane black magic to get gem5 to reset and dump stats. also acts like memory barrier for the compiler
 #define GEM5_DUMPSTATS  __asm__ __volatile__ (".word 0x040F; .word 0x0041;" : : "D" (0), "S" (0) :"memory")
 #define GEM5_RESETSTATS __asm__ __volatile__ (".word 0x040F; .word 0x0040;" : : "D" (0), "S" (0) :"memory")
+#define COMPILER_MEM_BARRIER __asm__ __volatile__ ("" : : "D" (0), "S" (0) :"memory")
 /* For ghidra disassembly to work add the following to Ghidra/Processors/x86/data/languages/ia.sinc :
 define pcodeop Gem5DumpStats;
 :GEM5_DUMPSTATS          is byte=0x0F; byte=0x04; byte=0x41; byte=0x00 { Gem5DumpStats(); }
@@ -22,7 +23,7 @@ define pcodeop Gem5ResetStats;
 
 typedef struct
 {
-    u_int64_t data;
+    volatile u_int64_t data;
     u_int64_t garbage[7];
 } cache_line;
 
@@ -54,6 +55,7 @@ main(int argc, char *argv[])
     for (u_int64_t i = 0; i < cache_num_lines; ++i) {
         data_array[i].data = 0;
     }
+    COMPILER_MEM_BARRIER;
     for (u_int64_t i = 0; i < cache_num_lines; ++i) {
         flush_array[i].data = 0;
     }
@@ -101,6 +103,7 @@ main(int argc, char *argv[])
         for (u_int64_t i = 0; i < cache_associativety; ++i) {
             sum1 += data_array[i*cache_num_sets].data;
         }
+        COMPILER_MEM_BARRIER;
         // access aliasing element from flush array
         sum1 += flush_array[0].data;
         GEM5_RESETSTATS;
