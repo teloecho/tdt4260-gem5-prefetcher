@@ -105,9 +105,12 @@ process.gid = os.getgid()
 process.cmd = [wrkld] + benchmark.opt.split()
 
 mp0_path = process.executable
-
+system.cpu[0].dcache.prefetcher.table_assoc = 16
+system.l2.prefetcher.table_assoc = 16
+system.l3.prefetcher.table_assoc = 16
 system.cpu[0].workload = process
 system.cpu[0].createThreads()
+
 
 #print(os.listdir())
 src = f"spec2017_cpts/{benchmark.name}-cpt"

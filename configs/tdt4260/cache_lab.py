@@ -34,7 +34,7 @@ cpu.numThreads = 1
 
 system = System(cpu = [cpu(cpu_id=0)],
                 mem_mode = mem,
-                mem_ranges = [AddrRange("3GB")],
+                mem_ranges = [AddrRange("8GB")],
                 cache_line_size = "64")
 
 system.voltage_domain = VoltageDomain(voltage = "1V")
