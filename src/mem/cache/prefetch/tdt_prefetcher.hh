@@ -62,6 +62,9 @@ class TDTPrefetcher : public Queued
         }
     } pcTableInfo;
 
+    // A basic entry you can use for designing your prefetcher
+    // You can extend this type of entry with more data like cycle accessed
+    // Recommend to store this in a a map and look through to find matching entries
     struct TDTEntry : public TaggedEntry
     {
         TDTEntry();
@@ -72,12 +75,15 @@ class TDTPrefetcher : public Queued
 
     };
 
+    // This redefines an associative set as the PC Table, a Set can be indexed
+    // into by a PC, so a PC will go to a single TDTEntry (or return nullptr)
     typedef AssociativeSet<TDTEntry> PCTable;
+
+    // The following can safely be ignored
     std::unordered_map<int, PCTable> pcTables;
-
     PCTable* findTable(int context);
-
     PCTable* allocateNewContext(int context);
+    // The preceding can safely be ignored
 
   public:
     TDTPrefetcher(const TDTPrefetcherParams &p);

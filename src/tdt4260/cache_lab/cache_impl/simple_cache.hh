@@ -39,8 +39,6 @@ class SimpleCache : public Interface
         bool isL2;
         bool isL3;
 
-        int ctr = 0;
-
         const char *cacheName;
 
         std::vector<std::vector<Entry *>> entries;
