@@ -2,3 +2,5 @@
 ./exchange2_s 6 ;33100000000
 ./mcf_s inp.in  ;25600000000
 ./deepsjeng_s ref.txt ;24400000000
+./x264_s --pass 1 --stats x264_stats.log --bitrate 1000 --frames 1000 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 ;93500000000
+./imagick_s -limit disk 0 refspeed_input.tga -resize 817% -rotate -2.76 -shave 540x375 -alpha remove -auto-level -contrast-stretch 1x1% -colorspace Lab -channel R -equalize +channel -colorspace sRGB -define histogram:unique-colors=false -adaptive-blur 0x5 -despeckle -auto-gamma -adaptive-sharpen 55 -enhance -brightness-contrast 10x10 -resize 30% refspeed_output.tga ;40400000000

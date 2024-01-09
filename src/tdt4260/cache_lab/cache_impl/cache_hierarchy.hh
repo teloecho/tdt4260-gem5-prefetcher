@@ -25,13 +25,9 @@ class CacheHierarchy : public SimObject
 
     private:
         SimpleCache L1Cache;
-//        SimpleCache L2Cache;
-//        SimpleCache L3Cache;
 
         CacheInterconnect cpuInterconnect;
         CacheInterconnect L1Interconnect;
-//        CacheInterconnect L2Interconnect;
-//        CacheInterconnect L3Interconnect;
 
         SimpleMem memory;
 
