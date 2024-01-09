@@ -7,7 +7,7 @@ gem5_root = os.path.abspath("../../..")
 gem5_bin = f"{gem5_root}/build/X86/gem5.opt"
 config = f"{gem5_root}/configs/tdt4260/prefetcher.py"
 
-num_benchmarks = 4
+num_benchmarks = 6
 
 for x in range(num_benchmarks):
     os.chdir("spec2017")
@@ -36,7 +36,7 @@ for x in range(num_benchmarks):
                 data.append((line[0], line[1]))
     others.append(data)
 
-b_names = ["gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s"]
+b_names = ["gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s"]
 
 with open(result_dst, "w") as out:
     out.write("Summary of benchmarking follows...\n")
