@@ -1,5 +1,6 @@
 #include "mem/cache/prefetch/tdt_prefetcher.hh"
 
+#include "debug/HWPrefetch.hh"
 #include "mem/cache/prefetch/associative_set_impl.hh"
 #include "mem/cache/replacement_policies/base.hh"
 #include "params/TDTPrefetcher.hh"
@@ -56,6 +57,11 @@ void
 TDTPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                  std::vector<AddrPriority> &addresses)
 {
+    if (!pfi.hasPC()) {
+        DPRINTF(HWPrefetch, "Ignoring request with no PC.\n");
+        return;
+    }
+
     // access_addr is the memory address (of the cache line) requested
     Addr access_addr = pfi.getAddr();
     // access pc is the pc of the inst that requests the cache line

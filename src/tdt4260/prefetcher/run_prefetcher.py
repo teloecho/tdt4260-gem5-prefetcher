@@ -14,7 +14,7 @@ for x in range(num_benchmarks):
     output_dir = f"prefetcher_out_{x}"
     if (os.path.exists(f"prefetcher_out_{x}")):
         shutil.rmtree(f"prefetcher_out_{x}")
-    run_ref = f"{gem5_bin} -r --outdir={output_dir} {config} --iteration {x}"
+    run_ref = f"{gem5_bin} -v -r --outdir={output_dir} {config} --iteration {x}"
     os.system(run_ref)
     os.chdir(cwd)
 
@@ -53,4 +53,4 @@ with open(result_dst, "w") as out:
             out.write(f"{y[0]}: {y[1]}\n")
         out.write("\n\n\n")
 
-        
+
