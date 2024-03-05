@@ -205,3 +205,7 @@ class TDTPrefetcher(QueuedPrefetcher):
     table_replacement_policy = Param.BaseReplacementPolicy(RandomRP(),
         "Replacement policy of the PC table")
 
+class BestOffsetPrefetcher(QueuedPrefetcher):
+    type = 'BestOffsetPrefetcher'
+    cxx_class = 'gem5::prefetch::BestOffsetPrefetcher'
+    cxx_header = "mem/cache/prefetch/best_offset.hh"
