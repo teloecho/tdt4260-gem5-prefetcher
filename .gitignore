@@ -34,3 +34,4 @@ configs/dram/lowp_sweep.cfg
 .vscode
 src/tdt4260/prefetcher/spec2017/prefetcher*
 src/tdt4260/prefetcher/spec2017/spec2017_cpts/*
+src/tdt4260/prefetcher/spec2017/
