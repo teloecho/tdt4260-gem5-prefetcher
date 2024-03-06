@@ -73,11 +73,7 @@ system.cpu[0].createThreads()
 system.cpu[0].cache_hierarchy = BaseCacheHierarchy(
     blockSize = 64,
     l1CacheSize = args.l1CacheSize,
-    l1CacheAssociativity = args.l1CacheAssociativity,
-    # l2CacheSize = 131072,
-    # l2CacheAssociativity = 16,
-    # l3CacheSize = 4194304,
-    # l3CacheAssociativity = 32
+    l1CacheAssociativity = args.l1CacheAssociativity
 )
 
 system.workload = SEWorkload.init_compatible(mp0_path)

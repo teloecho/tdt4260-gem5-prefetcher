@@ -1,21 +1,23 @@
+#!/usr/bin/env python3
 import os
 import shutil
 import sys
+import subprocess
 
 cwd = os.getcwd()
 gem5_root = os.path.abspath("../../..")
 gem5_bin = f"{gem5_root}/build/X86/gem5.opt"
 config = f"{gem5_root}/configs/tdt4260/prefetcher.py"
 
-num_benchmarks = 4
+num_benchmarks = 6
 
 for x in range(num_benchmarks):
     os.chdir("spec2017")
     output_dir = f"prefetcher_out_{x}"
     if (os.path.exists(f"prefetcher_out_{x}")):
         shutil.rmtree(f"prefetcher_out_{x}")
-    run_ref = f"{gem5_bin} -r --outdir={output_dir} {config} --iteration {x}"
-    os.system(run_ref)
+    subprocess.run([gem5_bin, "-v", "-r", f"--outdir={output_dir}", config,
+                    "--iteration", str(x)])
     os.chdir(cwd)
 
 result_dst = "results/results_summary.txt"
@@ -36,7 +38,7 @@ for x in range(num_benchmarks):
                 data.append((line[0], line[1]))
     others.append(data)
 
-b_names = ["gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s"]
+b_names = ["gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s"]
 
 with open(result_dst, "w") as out:
     out.write("Summary of benchmarking follows...\n")
@@ -53,4 +55,4 @@ with open(result_dst, "w") as out:
             out.write(f"{y[0]}: {y[1]}\n")
         out.write("\n\n\n")
 
-        
+

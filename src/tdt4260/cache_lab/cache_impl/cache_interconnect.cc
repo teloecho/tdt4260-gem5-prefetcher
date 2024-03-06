@@ -20,6 +20,8 @@ CacheInterconnect::CacheInterconnectStats::CacheInterconnectStats(
     ADD_STAT(respReceived, statistics::units::Count::get(),
             "Total number of resps received from mem side") {}
 
+// This function is called when the interconnects received a memory
+// package from the CPU side (the request side) 
 void
 CacheInterconnect::recvReq(Addr req, int size)
 {
@@ -31,6 +33,8 @@ CacheInterconnect::recvReq(Addr req, int size)
     }
 }
 
+// This function is called when the interconnects received a memory
+// package from the memory side (the response side) 
 void
 CacheInterconnect::recvResp(Addr resp)
 {
@@ -39,6 +43,7 @@ CacheInterconnect::recvResp(Addr resp)
         cpuSideCache->recvResp(resp);
 }
 
+// Used for configuring the CPU (request) side of the interconnect
 void
 CacheInterconnect::setCpuSideCache(Interface *cpuCache)
 {
@@ -46,6 +51,7 @@ CacheInterconnect::setCpuSideCache(Interface *cpuCache)
     cpuSideCache = cpuCache;
 }
 
+// Used for configuring the memory (response) side of the interconnect
 void
 CacheInterconnect::setMemSideCache(Interface *memCache)
 {
@@ -53,6 +59,7 @@ CacheInterconnect::setMemSideCache(Interface *memCache)
     memSideCache = memCache;
 }
 
+// Used if this is the LLC (last-level cache) to directly set memory side to memory
 void
 CacheInterconnect::setMemory(Interface *mem)
 {

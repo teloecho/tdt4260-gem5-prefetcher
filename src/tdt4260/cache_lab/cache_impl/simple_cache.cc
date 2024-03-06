@@ -21,8 +21,11 @@ SimpleCache::SimpleCache(int size, int blockSize, int associativity,
     // allocate entries for all sets and ways
     for (int i = 0; i < this->numSets; i++) {
         std::vector<Entry *> vec;
+
         // TODO: Associative: Allocate as many entries as there are ways
+        // i.e. replace vector with vector of vector and build ways
         vec.push_back(new Entry());
+
         entries.push_back(vec);
     }
 }
@@ -41,18 +44,21 @@ void
 SimpleCache::recvReq(Addr req, int size)
 {
     ++stats.reqsReceived;
+
     int index = calculateIndex(req);
     int tag = calculateTag(req);
-    ctr++;
 
     DPRINTF(TDTSimpleCache, "Debug: Addr: %#x, index: %d, tag: %d, in %s\n",
             req, index, tag, cacheName);
     DPRINTF(AllAddr, "%#x\n", req);
     DPRINTF(AllCacheLines, "%#x\n", req >> ((int) std::log2(blockSize)));
+
+    // if cache line already in cache
     if (hasLine(index, tag)) {
         ++stats.reqsServiced;
         int way = lineWay(index, tag);
         DPRINTF(TDTSimpleCache, "Hit: way: %d\n", way);
+
         // TODO: Associative: Update LRU info for line in entries
 
         sendResp(req);
@@ -65,8 +71,10 @@ void
 SimpleCache::recvResp(Addr resp)
 {
     ++stats.respsReceived;
+
     int index = calculateIndex(resp);
     int tag = calculateTag(resp);
+
     // there should never be a request (and thus a response) for a line already in the cache
     assert(!hasLine(index, tag));
 
