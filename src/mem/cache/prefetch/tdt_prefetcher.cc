@@ -57,14 +57,12 @@ void
 TDTPrefetcher::notifyFill(const PacketPtr &ptr)
 {
     //A cache line has been filled in
-    printf("cache line fill \n");
 }
 
 void
 TDTPrefetcher::notifyPrefetchFill(const PacketPtr &ptr)
 {
     //A cache line that was prefetched has been filled in
-    printf("cache line prefetch fill \n");
 }
 
 void
