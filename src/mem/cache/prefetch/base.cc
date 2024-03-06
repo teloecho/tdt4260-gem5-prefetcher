@@ -88,6 +88,8 @@ Base::PrefetchListener::notify(const PacketPtr &pkt)
 {
     if (isFill) {
         parent.notifyFill(pkt);
+    } else if (isPrefetchFill) {
+        parent.notifyPrefetchFill(pkt);
     } else {
         parent.probeNotify(pkt, miss);
     }
@@ -288,6 +290,8 @@ Base::regProbeListeners()
                                                  false));
         listeners.push_back(new PrefetchListener(*this, pm, "Hit", false,
                                                  false));
+        listeners.push_back(new PrefetchListener(*this, pm, "Prefetch Fill", false,
+                                                 false, true));
     }
 }
 

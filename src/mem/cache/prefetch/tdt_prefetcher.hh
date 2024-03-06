@@ -79,6 +79,10 @@ class TDTPrefetcher : public Queued
 
     PCTable* allocateNewContext(int context);
 
+    void notifyPrefetchFill(const PacketPtr &ptr) override;
+
+    void notifyFill(const PacketPtr &ptr) override;
+
   public:
     TDTPrefetcher(const TDTPrefetcherParams &p);
 

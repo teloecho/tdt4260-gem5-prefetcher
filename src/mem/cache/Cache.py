@@ -97,7 +97,7 @@ class BaseCache(ClockedObject):
     is_read_only = Param.Bool(False, "Is this cache read only (e.g. inst)")
 
     prefetcher = Param.BasePrefetcher(NULL,"Prefetcher attached to cache")
-    prefetch_on_access = Param.Bool(False,
+    prefetch_on_access = Param.Bool(True,
          "Notify the hardware prefetcher on every access (not just misses)")
     prefetch_on_pf_hit = Param.Bool(False,
         "Notify the hardware prefetcher on hit on prefetched lines")
