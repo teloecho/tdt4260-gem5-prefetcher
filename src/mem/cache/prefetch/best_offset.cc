@@ -61,7 +61,8 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         }
 
         // but here we might get a new bestOffset
-        int bestOffset_temp, bestScore_temp = 0;
+        int bestOffset_temp = 0;
+        int bestScore_temp = 0;
         for(auto& pair : M.offsetScorePair){
             if(pair.second > bestScore_temp){
                 bestScore_temp = pair.second;
@@ -88,4 +89,5 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     }
 }
 
+}
 }
