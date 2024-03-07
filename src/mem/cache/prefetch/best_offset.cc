@@ -22,16 +22,29 @@ void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                         std::vector<AddrPriority> &addresses){
     Addr access_addr = pfi.getAddr();
-
     if (!pfi.hasPC()) {
         DPRINTF(HWPrefetch, "Ignoring request with no PC.\n");
         return;
     }
 
-    
+    uint64_t blockAddress = (access_addr >> std::log2(Base::blkSize));
+    if (hasBeenPrefetched(access_addr, pfi.isSecure())) {
+        // append blockAddress minus bestOffset (Y - D) to recentRequests
+    }
+    else if () {
+        // append blockAddress (X) to recentRequests
+    }
 
 
-    addresses.push_back(AddrPriority(access_addr + Base::blkSize, 0));
+    if(M.prefetcherEnabled){
+        addresses.push_back(AddrPriority(access_addr + Base::blkSize * M.bestOffset, 0));
+    }
+
+    M.subround++;
+    if(M.subround == M.NUMBER_OF_OFFSETS){
+        M.subround = 0;
+        M.round++;
+    }
 }
 
 }
