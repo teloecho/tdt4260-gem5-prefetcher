@@ -18,7 +18,7 @@ BestOffsetPrefetcher::BestOffsetPrefetcher(const BestOffsetPrefetcherParams &par
 void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                         std::vector<AddrPriority> &addresses){
-    DPRINTF(DebugPrefetcher, "Prefetcher invoked\n");
+    DPRINTF(HWPrefetch, "Prefetcher invoked\n");
     Addr accessAddr = pfi.getAddr();
     if (!pfi.hasPC()) {
         return;
@@ -79,7 +79,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 }
 
 void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
-    DPRINTF(DebugPrefetcher, "Cache fill\n");
+    DPRINTF(HWPrefetch, "Cache fill\n");
     if(!pkt->cmd.isHWPrefetch()){
         return;
     }

@@ -3,6 +3,7 @@
 
 #include "base/types.hh"
 #include "mem/cache/prefetch/queued.hh"
+#include "debug/HWPrefetch.hh"
 #include <deque>
 #include <algorithm>
 
