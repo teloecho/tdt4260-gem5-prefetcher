@@ -20,9 +20,17 @@ BestOffsetPrefetcher::BestOffsetPrefetcher(const BestOffsetPrefetcherParams &par
 
 void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
-                                        std::vector<AddrPriority> &addresses)
-{
+                                        std::vector<AddrPriority> &addresses){
     Addr access_addr = pfi.getAddr();
+
+    if (!pfi.hasPC()) {
+        DPRINTF(HWPrefetch, "Ignoring request with no PC.\n");
+        return;
+    }
+
+    
+
+
     addresses.push_back(AddrPriority(access_addr + Base::blkSize, 0));
 }
 
