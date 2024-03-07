@@ -3,6 +3,8 @@
 
 #include "base/types.hh"
 #include "mem/cache/prefetch/queued.hh"
+#include <deque>
+#include <algorithm>
 
 namespace gem5
 {
@@ -26,26 +28,26 @@ class BestOffsetPrefetcher : public Queued
 
   protected:
 		struct Members {
-			const int SCORE_MAX;
-			const int ROUND_MAX;
-			const int BAD_SCORE;
-			const int RR_SIZE;
-			const int NUMBER_OF_OFFSETS;
+			const int SCORE_MAX = 31;
+			const int ROUND_MAX = 100;
+			const int BAD_SCORE = 10;
+			const int RR_SIZE = 256;
+			const int NUMBER_OF_OFFSETS = 3;
 
 			bool prefetcherEnabled = false;
 			int bestOffset = 0;
 			int subround = 0;
 			int round = 0;
 
-			std::vector<std::pair<int, int>> scores;
-			std::queue<int> recentRequests;
+			std::vector<std::pair<int, int>> offsetScorePair {{1, 0}, {2, 0}, {3, 0}};
+			std::deque<int> recentRequests;
 		} M;
 
   public:
     BestOffsetPrefetcher(const BestOffsetPrefetcherParams &p);
 
     void calculatePrefetch(const PrefetchInfo &pf1,
-                           std::vector<AddrPriority> &addresses) override;
+                           std::vector<AddrPriority> &addresses);
 
 };
 
