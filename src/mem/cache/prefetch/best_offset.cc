@@ -28,7 +28,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 
     uint64_t blockAddress = (access_addr >> std::log2(Base::blkSize));
     if (hasBeenPrefetched(access_addr, pfi.isSecure())) {
-        // append blockAddress minus bestOffset (Y - D) to recentRequests
+        blockAddress = blockAddress - M.bestOffset;
     }
     else if () {
         // append blockAddress (X) to recentRequests
