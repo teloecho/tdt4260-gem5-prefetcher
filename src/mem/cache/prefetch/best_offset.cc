@@ -24,7 +24,6 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     Addr access_addr = pfi.getAddr();
 
     if (!pfi.hasPC()) {
-        DPRINTF(HWPrefetch, "Ignoring request with no PC.\n");
         return;
     }
 
