@@ -25,6 +25,20 @@ class BestOffsetPrefetcher : public Queued
 {
 
   protected:
+		struct Members {
+			const int SCORE_MAX;
+			const int ROUND_MAX;
+			const int BAD_SCORE;
+			const int RR_SIZE;
+			const int NUMBER_OF_OFFSETS
+
+			bool prefetcherEnabled = false;
+			int bestOffset = 0;
+			int round = 0;
+
+			std::vector<std::pair<int, int>> scores;
+			std::vector<Addr> recentRequests;
+		};
 
   public:
     BestOffsetPrefetcher(const BestOffsetPrefetcherParams &p);
