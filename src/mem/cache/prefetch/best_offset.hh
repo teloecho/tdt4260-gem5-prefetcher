@@ -32,14 +32,14 @@ class BestOffsetPrefetcher : public Queued
 			const int ROUND_MAX = 100;
 			const int BAD_SCORE = 10;
 			const int RR_SIZE = 256;
-			const int NUMBER_OF_OFFSETS = 3;
+			const int NUMBER_OF_OFFSETS = 9;
 
 			bool prefetcherEnabled = false;
 			int bestOffset = 0;
 			int subround = 0;
 			int round = 0;
 
-			std::vector<std::pair<int, int>> offsetScorePair {{1, 0}, {2, 0}, {3, 0}};
+			std::vector<std::pair<int, int>> offsetScorePair {{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}};
 			std::deque<int> recentRequests;
 		} M;
 
@@ -48,6 +48,7 @@ class BestOffsetPrefetcher : public Queued
 
     void calculatePrefetch(const PrefetchInfo &pf1,
                            std::vector<AddrPriority> &addresses);
+	void notifyFill(const PacketPtr &pkt);
 
 };
 
