@@ -17,7 +17,7 @@ output_dir = f"prefetcher_out_{my_binary}"
 if (os.path.exists(output_dir)):
     shutil.rmtree(output_dir)
 
-subprocess.run([gem5_bin, "–debug-flags=HWPrefetch" ,"-r", f"--outdir={output_dir}", config,
+subprocess.run([gem5_bin, "-r", f"--outdir={output_dir}", config,
                 "-c", my_binary])
 os.chdir(cwd)
 

@@ -16,7 +16,7 @@ for x in range(num_benchmarks):
     output_dir = f"prefetcher_out_{x}"
     if (os.path.exists(f"prefetcher_out_{x}")):
         shutil.rmtree(f"prefetcher_out_{x}")
-    subprocess.run([gem5_bin, "-debug-flags=HWPrefetch", "-v", "-r", f"--outdir={output_dir}", config,
+    subprocess.run([gem5_bin, "-v", "-r", f"--outdir={output_dir}", config,
                     "--iteration", str(x)])
     os.chdir(cwd)
 

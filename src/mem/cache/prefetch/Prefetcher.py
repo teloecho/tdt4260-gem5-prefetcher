@@ -75,9 +75,9 @@ class BasePrefetcher(ClockedObject):
     on_write = Param.Bool(True, "Notify prefetcher on writes")
     on_data  = Param.Bool(True, "Notify prefetcher on data accesses")
     on_inst  = Param.Bool(True, "Notify prefetcher on instruction accesses")
-    prefetch_on_access = Param.Bool(Parent.prefetch_on_access,
+    prefetch_on_access = Param.Bool(True,
         "Notify the hardware prefetcher on every access (not just misses)")
-    prefetch_on_pf_hit = Param.Bool(Parent.prefetch_on_pf_hit,
+    prefetch_on_pf_hit = Param.Bool(True,
         "Notify the hardware prefetcher on hit on prefetched lines")
     use_virtual_addresses = Param.Bool(False,
         "Use virtual addresses for prefetching")

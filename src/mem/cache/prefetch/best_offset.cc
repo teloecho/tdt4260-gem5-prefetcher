@@ -18,21 +18,24 @@ BestOffsetPrefetcher::BestOffsetPrefetcher(const BestOffsetPrefetcherParams &par
 void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                         std::vector<AddrPriority> &addresses){
-    DPRINTF(HWPrefetch, "Prefetcher invoked\n");
+
     Addr accessAddr = pfi.getAddr();
     if (!pfi.hasPC()) {
         return;
     }
 
+    // blockAddress = tag bits + index bits
     uint64_t blockAddress = (accessAddr >> int(std::log2(Base::blkSize)));
 
     int blockAddressToBeTested = blockAddress - M.offsetScorePair[M.subround].first; // (X - d_i)
+    // if this resides in the RR, we increment the corresponding score
     for(auto& recent: M.recentRequests){
         if(recent == blockAddressToBeTested){
             M.offsetScorePair[M.subround].second++;
         }
     }
 
+    // at the end of a subround, we do the following
     M.subround++;
     if(M.subround != M.NUMBER_OF_OFFSETS){ // we don't conclude in the middle of a round
         if(M.prefetcherEnabled){
@@ -41,6 +44,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         return;
     }
 
+    // we have finished a round and do some book-keeping
     M.subround = 0;
     M.round++;
     if(M.round < M.SCORE_MAX){ // not possible to reach SCORE_MAX yet
@@ -53,12 +57,14 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     // but here we might get a new bestOffset
     int bestOffset_temp = 0;
     int bestScore_temp = 0;
+    // we find the offset that has scored the highest so far
     for(auto& pair : M.offsetScorePair){
         if(pair.second > bestScore_temp){
             bestScore_temp = pair.second;
             bestOffset_temp = pair.first;
         }
     }
+    // and check if the conditions for terminating this training phase are in place
     if(M.round == M.ROUND_MAX || bestScore_temp >= M.SCORE_MAX){
         M.bestOffset = bestOffset_temp;
         M.subround = 0;
@@ -66,12 +72,14 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         for(auto& pair : M.offsetScorePair){
             pair.second = 0;
         }
+        /*
         if(M.bestOffset > M.BAD_SCORE){
             M.prefetcherEnabled = true;
         }
         else{
             M.prefetcherEnabled = false;
         }
+        */
     }
     if(M.prefetcherEnabled){
         addresses.push_back(AddrPriority(accessAddr + Base::blkSize * M.bestOffset, 0));
@@ -79,12 +87,16 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 }
 
 void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
-    DPRINTF(HWPrefetch, "Cache fill\n");
+
+    // we only care about fills from the L3 that is the result of prefetching
     if(!pkt->cmd.isHWPrefetch()){
         return;
     }
+    
+    // blockAddress = tag bits + index bits
     int blockAddress = pkt->getAddr() >> int(std::log2(Base::blkSize));
     int blockAddressToBeStored = blockAddress - M.bestOffset; // (Y - D) in figure
+    // making sure that we only store the maximum capacity of RR
     if(M.recentRequests.size() == M.RR_SIZE){
         M.recentRequests.pop_back();
     }
