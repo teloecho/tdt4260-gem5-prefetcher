@@ -87,10 +87,14 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     }
 }
 
+void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
+    std::cout << "Normal fill from L3 with address: " << pkt->getAddr() << '\n';
+}
+
 void BestOffsetPrefetcher::notifyPrefetchFill(const PacketPtr &pkt){
 
     // we only care about fills from the L3 that is the result of prefetching
-    std:: cout << "Prefetch fill from L3\n";
+    std:: cout << "Prefetch fill from L3 with address: " << pkt->getAddr() << '\n';
     
     // blockAddress = tag bits + index bits
     int blockAddress = pkt->getAddr() >> int(std::log2(Base::blkSize));
