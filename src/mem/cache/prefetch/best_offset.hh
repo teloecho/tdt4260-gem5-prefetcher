@@ -48,6 +48,7 @@ class BestOffsetPrefetcher : public Queued
 				{54, 0}, {60, 0}, {64, 0}};
 			std::deque<int> recentRequests;
 		} M;
+		int log2blockSize = int(std::log2(Base::blkSize));
 
   public:
     BestOffsetPrefetcher(const BestOffsetPrefetcherParams &p);
