@@ -18,11 +18,12 @@ BestOffsetPrefetcher::BestOffsetPrefetcher(const BestOffsetPrefetcherParams &par
 void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                         std::vector<AddrPriority> &addresses){
-
+                                       
     Addr accessAddr = pfi.getAddr();
     if (!pfi.hasPC()) {
         return;
     }
+    std::cout << "Prefetcher invoked\n";
 
     // blockAddress = tag bits + index bits
     uint64_t blockAddress = (accessAddr >> int(std::log2(Base::blkSize)));
@@ -89,9 +90,11 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
 
     // we only care about fills from the L3 that is the result of prefetching
+    std::cout << "Fill from L3\n";
     if(!pkt->cmd.isHWPrefetch()){
         return;
     }
+    std::cout << "...And it is prefetched\n";
     
     // blockAddress = tag bits + index bits
     int blockAddress = pkt->getAddr() >> int(std::log2(Base::blkSize));
