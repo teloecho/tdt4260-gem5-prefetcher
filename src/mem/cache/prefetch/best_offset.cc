@@ -90,11 +90,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 void BestOffsetPrefetcher::notifyPrefetchFill(const PacketPtr &pkt){
 
     // we only care about fills from the L3 that is the result of prefetching
-    std::cout << "Fill from L3\n";
-    if(!pkt->cmd.isHWPrefetch()){
-        return;
-    }
-    std::cout << "...and it is prefetched\n";
+    std:: cout << "Prefetch fill from L3\n";
     
     // blockAddress = tag bits + index bits
     int blockAddress = pkt->getAddr() >> int(std::log2(Base::blkSize));
