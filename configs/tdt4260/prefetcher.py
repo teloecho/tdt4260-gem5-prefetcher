@@ -56,7 +56,7 @@ args.l1i_size = "32KiB"
 
 args.l2_size = "1280KiB" #1.25MiB
 args.l2_assoc = 20
-#args.l2_hwp_type = "BestOffsetPrefetcher"
+args.l2_hwp_type = "TDTPrefetcher"
 
 args.l3_size = "3MiB"
 args.l3_assoc = 12
