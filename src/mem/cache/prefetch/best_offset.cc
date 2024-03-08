@@ -23,12 +23,11 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     if (!pfi.hasPC()) {
         return;
     }
-    std::cout << "Prefetcher invoked\n";
+    std::cout << "L1 wants cache line: " << accessAddr << '\n';
 
-    // blockAddress = tag bits + index bits
-    uint64_t blockAddress = (accessAddr >> int(std::log2(Base::blkSize)));
+    std::cout << "New prefetch to L3 issued with address: " << accessAddr + M.bestOffset << '\n';
 
-    int blockAddressToBeTested = blockAddress - M.offsetScorePair[M.subround].first; // (X - d_i)
+    Addr blockAddressToBeTested = accessAddr - M.offsetScorePair[M.subround].first; // (X - d_i)
     // if this resides in the RR, we increment the corresponding score
     for(auto& recent: M.recentRequests){
         if(recent == blockAddressToBeTested){
@@ -40,7 +39,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     M.subround++;
     if(M.subround != M.NUMBER_OF_OFFSETS){ // we don't conclude in the middle of a round
         if(M.prefetcherEnabled){
-            addresses.push_back(AddrPriority(accessAddr + Base::blkSize * M.bestOffset, 0));
+            addresses.push_back(AddrPriority(accessAddr +  M.bestOffset, 0));
         }
         return;
     }
@@ -50,7 +49,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     M.round++;
     if(M.round < M.SCORE_MAX){ // not possible to reach SCORE_MAX yet
         if(M.prefetcherEnabled){
-            addresses.push_back(AddrPriority(accessAddr + Base::blkSize * M.bestOffset, 0));
+            addresses.push_back(AddrPriority(accessAddr + M.bestOffset, 0));
         }
         return;
     }
@@ -83,7 +82,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         */
     }
     if(M.prefetcherEnabled){
-        addresses.push_back(AddrPriority(accessAddr + Base::blkSize * M.bestOffset, 0));
+        addresses.push_back(AddrPriority(accessAddr + M.bestOffset, 0));
     }
 }
 
@@ -93,12 +92,11 @@ void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
 
 void BestOffsetPrefetcher::notifyPrefetchFill(const PacketPtr &pkt){
 
+    Addr prefetchFill = pkt->getAddr();
     // we only care about fills from the L3 that is the result of prefetching
-    std:: cout << "Prefetch fill from L3 with address: " << pkt->getAddr() << '\n';
+    std:: cout << "Prefetch fill from L3 with cache line address: " << prefetchFill << '\n';
     
-    // blockAddress = tag bits + index bits
-    int blockAddress = pkt->getAddr() >> int(std::log2(Base::blkSize));
-    int blockAddressToBeStored = blockAddress - M.bestOffset; // (Y - D) in figure
+    int blockAddressToBeStored = prefetchFill - M.bestOffset; // (Y - D) in figure
     // making sure that we only store the maximum capacity of RR
     if(M.recentRequests.size() == M.RR_SIZE){
         M.recentRequests.pop_back();
