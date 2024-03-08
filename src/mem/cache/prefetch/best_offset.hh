@@ -55,7 +55,7 @@ class BestOffsetPrefetcher : public Queued
     void calculatePrefetch(const PrefetchInfo &pf1,
                            std::vector<AddrPriority> &addresses);
 	
-	void notifyFill(const PacketPtr &pkt);
+	void notifyPrefetchFill(const PacketPtr &ptr) override;
 
 };
 

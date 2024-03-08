@@ -2509,6 +2509,7 @@ BaseCache::regProbePoints()
     ppMiss = new ProbePointArg<PacketPtr>(this->getProbeManager(), "Miss");
     ppFill = new ProbePointArg<PacketPtr>(this->getProbeManager(), "Fill");
     ppDataUpdate = new ProbePointArg<DataUpdate>(this->getProbeManager(), "Data Update");
+    ppPrefetchFill = new ProbePointArg<PacketPtr>(this->getProbeManager(), "Prefetch Fill");
 }
 
 ///////////////
