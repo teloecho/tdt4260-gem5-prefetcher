@@ -88,7 +88,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 }
 
 void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
-    std::cout << "Normal fill from L3 with address: " << pkt->getAddr() << '\n';
+    std::cout << "Fill from L3 with address: " << pkt->getAddr() << '\n';
 }
 
 void BestOffsetPrefetcher::notifyPrefetchFill(const PacketPtr &pkt){
