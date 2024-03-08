@@ -26,8 +26,6 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     Addr tag = (accessAddr >> log2blockSize);
     std::cout << "L1 wants tag: " << tag << '\n';
 
-    std::cout << "New prefetch to L3 issued with tag: " << tag + M.bestOffset << '\n';
-
     Addr tagToBeTested = tag - M.offsetScorePair[M.subround].first; // (X - d_i)
     // if this resides in the RR, we increment the corresponding score
     for(auto& recent: M.recentRequests){
@@ -41,6 +39,11 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     if(M.subround != M.NUMBER_OF_OFFSETS){ // we don't conclude in the middle of a round
         if(M.prefetcherEnabled){
             addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize ), 0));
+            std::cout << "New prefetch to L3 issued with tag: " << tag + M.bestOffset << '\n';
+        }
+        else{        
+            addresses.push_back(AddrPriority(accessAddr, 0));
+            std::cout << "New prefetch to L3 issued with tag: " << tag << '\n';
         }
         return;
     }
@@ -51,6 +54,11 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     if(M.round < M.SCORE_MAX){ // not possible to reach SCORE_MAX yet
         if(M.prefetcherEnabled){
             addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize), 0));
+            std::cout << "New prefetch to L3 issued with tag: " << tag + M.bestOffset << '\n';
+        }
+        else{        
+            addresses.push_back(AddrPriority(accessAddr, 0));
+            std::cout << "New prefetch to L3 issued with tag: " << tag << '\n';
         }
         return;
     }
@@ -73,17 +81,20 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         for(auto& pair : M.offsetScorePair){
             pair.second = 0;
         }
-        /*
         if(M.bestOffset > M.BAD_SCORE){
             M.prefetcherEnabled = true;
         }
         else{
             M.prefetcherEnabled = false;
         }
-        */
     }
     if(M.prefetcherEnabled){
         addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize ), 0));
+        std::cout << "New prefetch to L3 issued with tag: " << tag + M.bestOffset << '\n';
+    }
+    else{        
+        addresses.push_back(AddrPriority(accessAddr, 0));
+        std::cout << "New prefetch to L3 issued with tag: " << tag << '\n';
     }
 }
 

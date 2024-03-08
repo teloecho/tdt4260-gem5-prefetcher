@@ -35,7 +35,7 @@ class BestOffsetPrefetcher : public Queued
 			const int RR_SIZE = 256;
 			const int NUMBER_OF_OFFSETS = 27;
 
-			bool prefetcherEnabled = true;
+			bool prefetcherEnabled = false;
 			int bestOffset = 1;
 			int subround = 0;
 			int round = 0;
