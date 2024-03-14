@@ -20,7 +20,10 @@ from common.Caches import *
 from benchmarks import benchmarks
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--scoreMax", type=int, default=1)
+parser.add_argument("--scoreMax", type=int, default=8)
+parser.add_argument("--roundMax", type=int, default=16)
+parser.add_argument("--badScore", type=int, default=4)
+parser.add_argument("--rrSize", type=int, default=64)
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)
 
@@ -112,6 +115,9 @@ system.cpu[0].icache.prefetcher.table_assoc = 16
 
 # L2 prefetcher params
 system.l2.prefetcher.scoreMax = args.scoreMax
+system.l2.prefetcher.roundMax = args.roundMax
+system.l2.prefetcher.badScore = args.badScore
+system.l2.prefetcher.rrSize = args.rrSize
 
 #system.l3.prefetcher.table_assoc = 16
 system.cpu[0].workload = process

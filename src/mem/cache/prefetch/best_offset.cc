@@ -12,7 +12,8 @@ namespace prefetch
 
 
 BestOffsetPrefetcher::BestOffsetPrefetcher(const BestOffsetPrefetcherParams &params)
-    : Queued(params), SCORE_MAX(params.scoreMax) {}
+    : Queued(params), SCORE_MAX(params.scoreMax), ROUND_MAX(params.roundMax), BAD_SCORE(params.badScore),
+    RR_SIZE(params.rrSize) {}
 
 
 void

@@ -210,4 +210,7 @@ class BestOffsetPrefetcher(QueuedPrefetcher):
     cxx_class = 'gem5::prefetch::BestOffsetPrefetcher'
     cxx_header = "mem/cache/prefetch/best_offset.hh"
 
-    scoreMax = Param.Int(16, "Max score")
+    scoreMax = Param.Int(8, "Max score")
+    roundMax = Param.Int(16, "Max number of rounds")
+    badScore = Param.Int(4, "Bad score")
+    rrSize = Param.Int(64, "Size of RR")
