@@ -9,7 +9,7 @@ gem5_root = os.path.abspath("../../..")
 gem5_bin = f"{gem5_root}/build/X86/gem5.opt"
 config = f"{gem5_root}/configs/tdt4260/prefetcher.py"
 
-num_benchmarks = 1
+num_benchmarks = 6
 
 for x in range(num_benchmarks):
     os.chdir("spec2017")
