@@ -29,9 +29,8 @@ class BestOffsetPrefetcher : public Queued
 
   protected:
 		struct Members {
-			const int SCORE_MAX = 8;
-			const int ROUND_MAX = 16;
-			const int BAD_SCORE = 4;
+			const int ROUND_MAX = 6;
+			const int BAD_SCORE = 1;
 			const int RR_SIZE = 32;
 			const int NUMBER_OF_OFFSETS = 25;
 
@@ -48,6 +47,7 @@ class BestOffsetPrefetcher : public Queued
 				{54, 0}, {60, 0}};
 			std::deque<int> recentRequests;
 		} M;
+		const int SCORE_MAX;
 		int log2blockSize = int(std::log2(Base::blkSize));
 
   public:

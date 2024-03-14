@@ -9,7 +9,7 @@ gem5_root = os.path.abspath("../../..")
 gem5_bin = f"{gem5_root}/build/X86/gem5.opt"
 config = f"{gem5_root}/configs/tdt4260/prefetcher.py"
 
-num_benchmarks = 6
+num_benchmarks = 1
 
 for x in range(num_benchmarks):
     os.chdir("spec2017")
@@ -17,7 +17,7 @@ for x in range(num_benchmarks):
     if (os.path.exists(f"prefetcher_out_{x}")):
         shutil.rmtree(f"prefetcher_out_{x}")
     subprocess.run([gem5_bin, "-v", "-r", f"--outdir={output_dir}", config,
-                    "--iteration", str(x)])
+                    "--iteration", "--scoreMax 69", str(x)])
     os.chdir(cwd)
 
 result_dst = "results/results_summary.txt"

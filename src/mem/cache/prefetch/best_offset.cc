@@ -12,13 +12,14 @@ namespace prefetch
 
 
 BestOffsetPrefetcher::BestOffsetPrefetcher(const BestOffsetPrefetcherParams &params)
-    : Queued(params){}
+    : Queued(params), SCORE_MAX(params.scoreMax) {}
 
 
 void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                         std::vector<AddrPriority> &addresses){
                                        
+    std::cout << SCORE_MAX << '\n';
     Addr accessAddr = pfi.getAddr();
     if (!pfi.hasPC()) {
         return;
@@ -45,7 +46,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     // we have finished a round and do some book-keeping
     M.subround = 0;
     M.round++;
-    if(M.round < M.SCORE_MAX){ // not possible to reach SCORE_MAX yet
+    if(M.round < SCORE_MAX){ // not possible to reach SCORE_MAX yet
         if(M.prefetcherEnabled){
             addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize), 0));
         }
@@ -63,7 +64,7 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         }
     }
     // and check if the conditions for terminating this training phase are in place
-    if(M.round == M.ROUND_MAX || bestScore_temp >= M.SCORE_MAX){
+    if(M.round == M.ROUND_MAX || bestScore_temp >= SCORE_MAX){
         M.bestOffset = bestOffset_temp;
         M.subround = 0;
         M.round = 0;
