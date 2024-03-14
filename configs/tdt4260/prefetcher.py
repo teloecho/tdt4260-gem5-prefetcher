@@ -20,7 +20,7 @@ from common.Caches import *
 from benchmarks import benchmarks
 
 parser = argparse.ArgumentParser()
-parser.add_argument('scoreMax', type=int)
+parser.add_argument("--scoreMax", type=int, default=1)
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)
 
@@ -58,7 +58,6 @@ args.l1i_size = "32KiB"
 args.l2_size = "1280KiB" #1.25MiB
 args.l2_assoc = 20
 args.l2_hwp_type = "BestOffsetPrefetcher"
-args.scoreMax = scoreMax
 
 args.l3_size = "3MiB"
 args.l3_assoc = 12
@@ -111,8 +110,8 @@ system.cpu[0].dcache.prefetcher.table_assoc = 16
 system.cpu[0].icache.prefetcher.table_assoc = 16
 #system.l2.prefetcher.table_assoc = 16
 
-# According to BestOffset Prefetching this setting is required.
-system.l2.prefetch_on_pf_hit = True
+# L2 prefetcher params
+system.l2.prefetcher.scoreMax = args.scoreMax
 
 #system.l3.prefetcher.table_assoc = 16
 system.cpu[0].workload = process

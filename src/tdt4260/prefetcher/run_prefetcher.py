@@ -17,7 +17,7 @@ for x in range(num_benchmarks):
     if (os.path.exists(f"prefetcher_out_{x}")):
         shutil.rmtree(f"prefetcher_out_{x}")
     subprocess.run([gem5_bin, "-v", "-r", f"--outdir={output_dir}", config,
-                    "--iteration", "--scoreMax 69", str(x)])
+                    "--iteration", str(x), "--scoreMax", "69"])
     os.chdir(cwd)
 
 result_dst = "results/results_summary.txt"
