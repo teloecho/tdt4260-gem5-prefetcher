@@ -20,7 +20,6 @@ void
 BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
                                         std::vector<AddrPriority> &addresses){
                                        
-    std::cout << SCORE_MAX << '\n';
     Addr accessAddr = pfi.getAddr();
     if (!pfi.hasPC()) {
         return;
@@ -65,14 +64,14 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         }
     }
     // and check if the conditions for terminating this training phase are in place
-    if(M.round == M.ROUND_MAX || bestScore_temp >= SCORE_MAX){
+    if(M.round == ROUND_MAX || bestScore_temp >= SCORE_MAX){
         M.bestOffset = bestOffset_temp;
         M.subround = 0;
         M.round = 0;
         for(auto& pair : M.offsetScorePair){
             pair.second = 0;
         }
-        if(M.bestOffset > M.BAD_SCORE){
+        if(M.bestOffset > BAD_SCORE){
             M.prefetcherEnabled = true;
         }
         else{
@@ -89,7 +88,7 @@ void BestOffsetPrefetcher::notifyFill(const PacketPtr &pkt){
         Addr tag = (pkt->getAddr() >> log2blockSize);
         // we only care about fills from the L3 that is the result of prefetching
         // making sure that we only store the maximum capacity of RR
-        if(M.recentRequests.size() == M.RR_SIZE){
+        if(M.recentRequests.size() == RR_SIZE){
             M.recentRequests.pop_back();
         }
         M.recentRequests.push_front(tag);
@@ -103,7 +102,7 @@ void BestOffsetPrefetcher::notifyPrefetchFill(const PacketPtr &pkt){
     
     int tagToBeStored = tag - M.bestOffset; // (Y - D) in figure
     // making sure that we only store the maximum capacity of RR
-    if(M.recentRequests.size() == M.RR_SIZE){
+    if(M.recentRequests.size() == RR_SIZE){
         M.recentRequests.pop_back();
     }
     M.recentRequests.push_front(tagToBeStored);
