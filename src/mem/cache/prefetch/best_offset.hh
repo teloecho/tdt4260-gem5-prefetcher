@@ -29,10 +29,10 @@ class BestOffsetPrefetcher : public Queued
 
   protected:
 		struct Members {
-			const int SCORE_MAX = 10;
-			const int ROUND_MAX = 30;
-			const int BAD_SCORE = 3;
-			const int RR_SIZE = 128;
+			const int SCORE_MAX = 8;
+			const int ROUND_MAX = 16;
+			const int BAD_SCORE = 4;
+			const int RR_SIZE = 32;
 			const int NUMBER_OF_OFFSETS = 25;
 
 			bool prefetcherEnabled = false;
