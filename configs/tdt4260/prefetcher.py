@@ -22,7 +22,7 @@ from benchmarks import benchmarks
 parser = argparse.ArgumentParser()
 parser.add_argument("--scoreMax", type=int, default=8)
 parser.add_argument("--roundMax", type=int, default=16)
-parser.add_argument("--badScore", type=int, default=4)
+parser.add_argument("--badScore", type=int, default=1)
 parser.add_argument("--rrSize", type=int, default=64)
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)

@@ -10,8 +10,11 @@ gem5_bin = f"{gem5_root}/build/X86/gem5.opt"
 config = f"{gem5_root}/configs/tdt4260/prefetcher.py"
 
 num_benchmarks = 1
+rrSize = 64
+roundMax = 100
+badScore = 1
 
-for scoreMax in range(1, 16): 
+for scoreMax in range(1, roundMax): 
 
     for x in range(num_benchmarks):
         os.chdir("spec2017")
@@ -19,10 +22,14 @@ for scoreMax in range(1, 16):
         if (os.path.exists(f"prefetcher_out_{x}")):
             shutil.rmtree(f"prefetcher_out_{x}")
         subprocess.run([gem5_bin, "-v", "-r", f"--outdir={output_dir}", config,
-                        "--iteration", str(x), "--scoreMax", str(scoreMax)])
+                        "--iteration", str(x), 
+                        "--scoreMax", str(scoreMax),
+                        "--roundMax", str(roundMax),
+                        "--rrSize", str(rrSize),
+                        "--badScore", str(badScore)])
         os.chdir(cwd)
 
-    result_dst = f"results/{str(scoreMax)}results_summary.txt"
+    result_dst = f"results/RRsize:{str(rrSize)}_scoreMax:{str(scoreMax)}_roundMax:{str(roundMax)}.txt"
 
     ipcs = []
     others = []
@@ -36,7 +43,7 @@ for scoreMax in range(1, 16):
                     continue
                 if "ipc" in line[0]:
                     ipcs.append(line[1])
-                if "prefetcher" in line[0]:# or "cache" in line[0]:
+                if "prefetcher" in line[0]:
                     data.append((line[0], line[1]))
         others.append(data)
 

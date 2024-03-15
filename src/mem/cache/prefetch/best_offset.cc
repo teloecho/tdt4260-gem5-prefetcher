@@ -34,11 +34,13 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         }
     }
 
+    Addr bestOffset = M.bestOffset << log2blockSize;
+
     // at the end of a subround, we do the following
     M.subround++;
     if(M.subround != M.NUMBER_OF_OFFSETS){ // we don't conclude in the middle of a round
-        if(M.prefetcherEnabled){
-            addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize ), 0));
+        if(M.prefetcherEnabled && (accessAddr >> 12) == ((accessAddr + bestOffset) >> 12)){ // ensure that we don't cross page boundries
+            addresses.push_back(AddrPriority(accessAddr +  bestOffset, 0));
         }
         return;
     }
@@ -47,8 +49,8 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     M.subround = 0;
     M.round++;
     if(M.round < SCORE_MAX){ // not possible to reach SCORE_MAX yet
-        if(M.prefetcherEnabled){
-            addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize), 0));
+        if(M.prefetcherEnabled && (accessAddr >> 12) == ((accessAddr + bestOffset) >> 12)){
+            addresses.push_back(AddrPriority(accessAddr +  bestOffset, 0));           
         }
         return;
     }
@@ -78,8 +80,8 @@ BestOffsetPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
             M.prefetcherEnabled = false;
         }
     }
-    if(M.prefetcherEnabled){
-        addresses.push_back(AddrPriority(accessAddr +  (M.bestOffset << log2blockSize ), 0));
+    if(M.prefetcherEnabled && (accessAddr >> 12) == ((accessAddr + bestOffset) >> 12)){
+        addresses.push_back(AddrPriority(accessAddr +  bestOffset, 0));       
     }
 }
 

@@ -212,5 +212,5 @@ class BestOffsetPrefetcher(QueuedPrefetcher):
 
     scoreMax = Param.Int(8, "Max score")
     roundMax = Param.Int(16, "Max number of rounds")
-    badScore = Param.Int(4, "Bad score")
+    badScore = Param.Int(1, "Bad score")
     rrSize = Param.Int(64, "Size of RR")
