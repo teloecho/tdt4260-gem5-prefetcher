@@ -70,14 +70,14 @@ class BasePrefetcher(ClockedObject):
     # Get the block size from the parent (system)
     block_size = Param.Int(Parent.cache_line_size, "Block size in bytes")
 
-    on_miss = Param.Bool(False, "Only notify prefetcher on misses")
+    on_miss = Param.Bool(True, "Only notify prefetcher on misses")
     on_read = Param.Bool(True, "Notify prefetcher on reads")
-    on_write = Param.Bool(True, "Notify prefetcher on writes")
+    on_write = Param.Bool(False, "Notify prefetcher on writes")
     on_data  = Param.Bool(True, "Notify prefetcher on data accesses")
     on_inst  = Param.Bool(True, "Notify prefetcher on instruction accesses")
-    prefetch_on_access = Param.Bool(True,
+    prefetch_on_access = Param.Bool(False,
         "Notify the hardware prefetcher on every access (not just misses)")
-    prefetch_on_pf_hit = Param.Bool(Parent.prefetch_on_pf_hit,
+    prefetch_on_pf_hit = Param.Bool(True,
         "Notify the hardware prefetcher on hit on prefetched lines")
     use_virtual_addresses = Param.Bool(False,
         "Use virtual addresses for prefetching")
