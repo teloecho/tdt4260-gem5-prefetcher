@@ -1,0 +1,36 @@
+Summary of benchmarking follows...
+-----IPC-----
+gcc_s: 0.236531
+exchange2_s: 1.340970
+mcf_s: 0.835025
+deepsjeng_s: 1.234770
+x264_s: 1.269235
+imagick_s: 1.716766
+
+
+
+Detailed stats follow...
+gcc_s stats:
+
+
+
+exchange2_s stats:
+
+
+
+mcf_s stats:
+
+
+
+deepsjeng_s stats:
+
+
+
+x264_s stats:
+
+
+
+imagick_s stats:
+
+
+
