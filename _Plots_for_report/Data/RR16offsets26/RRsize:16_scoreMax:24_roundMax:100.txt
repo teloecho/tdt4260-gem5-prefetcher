@@ -1,0 +1,82 @@
+Summary of benchmarking follows...
+-----IPC-----
+gcc_s: 0.568532
+
+
+
+Detailed stats follow...
+gcc_s stats:
+system.l2.overallMshrMisses::l2.prefetcher: 194903
+system.l2.overallMshrMissLatency::l2.prefetcher: 14117366082
+system.l2.overallMshrMissRate::l2.prefetcher: inf
+system.l2.overallAvgMshrMissLatency::l2.prefetcher: 72432.779803
+system.l2.HardPFReq.mshrMisses::l2.prefetcher: 194903
+system.l2.HardPFReq.mshrMissLatency::l2.prefetcher: 14117366082
+system.l2.HardPFReq.mshrMissRate::l2.prefetcher: inf
+system.l2.HardPFReq.avgMshrMissLatency::l2.prefetcher: 72432.779803
+system.l2.prefetcher.demandMshrMisses: 73273
+system.l2.prefetcher.pfIssued: 195906
+system.l2.prefetcher.pfUnused: 10593
+system.l2.prefetcher.pfUseful: 179240
+system.l2.prefetcher.pfUsefulButMiss: 0
+system.l2.prefetcher.accuracy: 0.914929
+system.l2.prefetcher.coverage: 0.709825
+system.l2.prefetcher.pfHitInCache: 927
+system.l2.prefetcher.pfHitInMSHR: 76
+system.l2.prefetcher.pfHitInWB: 0
+system.l2.prefetcher.pfLate: 1003
+system.l2.prefetcher.pfIdentified: 195906
+system.l2.prefetcher.pfBufferHit: 0
+system.l2.prefetcher.pfInCache: 0
+system.l2.prefetcher.pfRemovedDemand: 0
+system.l2.prefetcher.pfRemovedFull: 0
+system.l2.prefetcher.pfSpanPage: 0
+system.l2.prefetcher.pfUsefulSpanPage: 0
+system.l2.prefetcher.power_state.pwrStateResidencyTicks::UNDEFINED: 39144616057143
+system.l2.tags.occupancies::l2.prefetcher: 13848.765438
+system.l2.tags.avgOccs::l2.prefetcher: 0.676209
+system.l3.demandHits::l2.prefetcher: 48
+system.l3.overallHits::l2.prefetcher: 48
+system.l3.demandMisses::l2.prefetcher: 194852
+system.l3.overallMisses::l2.prefetcher: 194852
+system.l3.demandMissLatency::l2.prefetcher: 14051097166
+system.l3.overallMissLatency::l2.prefetcher: 14051097166
+system.l3.demandAccesses::l2.prefetcher: 194900
+system.l3.overallAccesses::l2.prefetcher: 194900
+system.l3.demandMissRate::l2.prefetcher: 0.999754
+system.l3.overallMissRate::l2.prefetcher: 0.999754
+system.l3.demandAvgMissLatency::l2.prefetcher: 72111.639429
+system.l3.overallAvgMissLatency::l2.prefetcher: 72111.639429
+system.l3.demandMshrMisses::l2.prefetcher: 194852
+system.l3.overallMshrMisses::l2.prefetcher: 194852
+system.l3.demandMshrMissLatency::l2.prefetcher: 12753389506
+system.l3.overallMshrMissLatency::l2.prefetcher: 12753389506
+system.l3.demandMshrMissRate::l2.prefetcher: 0.999754
+system.l3.overallMshrMissRate::l2.prefetcher: 0.999754
+system.l3.demandAvgMshrMissLatency::l2.prefetcher: 65451.673609
+system.l3.overallAvgMshrMissLatency::l2.prefetcher: 65451.673609
+system.l3.ReadSharedReq.hits::l2.prefetcher: 48
+system.l3.ReadSharedReq.misses::l2.prefetcher: 194852
+system.l3.ReadSharedReq.missLatency::l2.prefetcher: 14051097166
+system.l3.ReadSharedReq.accesses::l2.prefetcher: 194900
+system.l3.ReadSharedReq.missRate::l2.prefetcher: 0.999754
+system.l3.ReadSharedReq.avgMissLatency::l2.prefetcher: 72111.639429
+system.l3.ReadSharedReq.mshrMisses::l2.prefetcher: 194852
+system.l3.ReadSharedReq.mshrMissLatency::l2.prefetcher: 12753389506
+system.l3.ReadSharedReq.mshrMissRate::l2.prefetcher: 0.999754
+system.l3.ReadSharedReq.avgMshrMissLatency::l2.prefetcher: 65451.673609
+system.l3.tags.occupancies::l2.prefetcher: 31891.979633
+system.l3.tags.avgOccs::l2.prefetcher: 0.648844
+system.mem_ctrls.avgPriority_l2.prefetcher::samples: 194851.00
+system.mem_ctrls.requestorReadBytes::l2.prefetcher: 12470464
+system.mem_ctrls.requestorReadRate::l2.prefetcher: 2129080803.354104757309
+system.mem_ctrls.requestorReadAccesses::l2.prefetcher: 194851
+system.mem_ctrls.requestorReadTotalLat::l2.prefetcher: 6808176366
+system.mem_ctrls.requestorReadAvgLat::l2.prefetcher: 34940.42
+system.mem_ctrls.dram.bytesRead::l2.prefetcher: 12470464
+system.mem_ctrls.dram.numReads::l2.prefetcher: 194851
+system.mem_ctrls.dram.bwRead::l2.prefetcher: 2129080803
+system.mem_ctrls.dram.bwTotal::l2.prefetcher: 2129080803
+
+
+

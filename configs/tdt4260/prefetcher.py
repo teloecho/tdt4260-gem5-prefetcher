@@ -20,6 +20,10 @@ from common.Caches import *
 from benchmarks import benchmarks
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--scoreMax", type=int, default=8)
+parser.add_argument("--roundMax", type=int, default=16)
+parser.add_argument("--badScore", type=int, default=1)
+parser.add_argument("--rrSize", type=int, default=64)
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)
 
@@ -49,10 +53,10 @@ args.l3cache = True
 
 args.l1d_size = "48KiB"
 args.l1d_assoc = 12
-args.l1d_hwp_type = "TDTPrefetcher"
+#args.l1d_hwp_type = "TDTPrefetcher"
 
 args.l1i_size = "32KiB"
-args.l1i_hwp_type = "TDTPrefetcher"
+#args.l1i_hwp_type = "TDTPrefetcher"
 
 args.l2_size = "1280KiB" #1.25MiB
 args.l2_assoc = 20
@@ -60,7 +64,7 @@ args.l2_hwp_type = "BestOffsetPrefetcher"
 
 args.l3_size = "3MiB"
 args.l3_assoc = 12
-args.l3_hwp_type = "TDTPrefetcher"
+#args.l3_hwp_type = "BestOffsetPrefetcher"
 
 
 num_cpus = 1
@@ -106,12 +110,16 @@ process.cmd = [wrkld] + benchmark.opt.split()
 
 mp0_path = process.executable
 system.cpu[0].dcache.prefetcher.table_assoc = 16
-# system.l2.prefetcher.table_assoc = 16
+system.cpu[0].icache.prefetcher.table_assoc = 16
+#system.l2.prefetcher.table_assoc = 16
 
-# According to BestOffset Prefetching this setting is required.
-system.l2.prefetch_on_pf_hit = True
+# L2 prefetcher params
+system.l2.prefetcher.scoreMax = args.scoreMax
+system.l2.prefetcher.roundMax = args.roundMax
+system.l2.prefetcher.badScore = args.badScore
+system.l2.prefetcher.rrSize = args.rrSize
 
-system.l3.prefetcher.table_assoc = 16
+#system.l3.prefetcher.table_assoc = 16
 system.cpu[0].workload = process
 system.cpu[0].createThreads()
 
