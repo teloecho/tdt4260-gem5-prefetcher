@@ -1,5 +1,21 @@
-sorry for the duplicate readme files
-gem5 is weird and requires the README file to exist in order to successfully build for some reason...
+# Prefetcher Lab
+This is our implementation, plotting code and report for the prefetcher lab of the
+course [computer architecture (TDT4260) at NTNU](https://www.ntnu.edu/studies/courses/TDT4260/2023).
+
+The goal is to research on, understand and implement a self-chosen prefetcher.
+We dig into [Best-Offset-Prefetching as presented by Michaud](https://inria.hal.science/hal-01254863v1).
+
+The prefetcher header and implementation can be found in
+[best_offset.hh](/src/mem/cache/prefetch/best_offset.hh) and
+[best_offset.cc](/src/mem/cache/prefetch/best_offset.cc) respectively.
+Our developemnt starts on an adapted gem5 version.
+Our teachers provide the [prepared version of the gem5 repository](https://github.com/davidmetz/gem5-tdt4260),
+leaving only basic prefetchers in `src/men/cache/prefetch/`. There our develoments start. See commit history.
+
+Plotting logic for our measuements can be found in the [plot jupyter notebook](/_Plots_for_report/plot.ipynb).
+
+Our [report](/report_prefechter_lab_bo/report_bop.pdf) describes the background of prefetching in general,
+our implementation and our performance measuement results compared to less sophisticated or no prefetching.
 
 # Getting started
 
@@ -17,8 +33,10 @@ cd /gem5
 scons -j9 build/X86/gem5.opt
 ```
 
-Download the teachers provided excerpt ("gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s") of the [spec2017](https://static.teloecho.eu/tdt4260/spec2017.tar.xz) benchmark suit. (See also [README/task description of prefetcher lab](/src/tdt4260/README.md).)
+Download the teachers provided excerpt of the [spec2017](https://static.teloecho.eu/tdt4260/spec2017.tar.xz)
+benchmark suit ("gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s").
 And extract it to `src/tdt4260/prefetcher/spec2017`.
+See also [README/task description of prefetcher lab](/src/tdt4260/README.md).
 
 spec2017.tar.xz: [sha256sum](https://static.teloecho.eu/tdt4260/spec2017.tar.xz.sha256sum) `aae165e54e7144463ff2017ca6c5883c90791ca4395681b84e2f00c312628551`
 
@@ -28,7 +46,10 @@ cd src/tdt4260/prefetcher
 python3 run_prefetcher.py
 ```
 
-# Old README
+-----
+Sorry for the doubled readme files (`README.md` and `README`).
+Gem5 depends on the `README` file to exist for successful builds.
+# Gem5 Origianl README
 
 This is the gem5 simulator.
 
