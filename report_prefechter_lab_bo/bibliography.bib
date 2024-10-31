@@ -1,0 +1,132 @@
+@article{Server,
+  author = {Bakhshalipour, M et al.},
+  title = {A Survey on Recent Hardware Data Prefetching Approaches with An Emphasis on Servers},
+  journal = {CoRR},
+  volume = {abs/2009.00715},
+  year = {2020},
+  url = {https://arxiv.org/abs/2009.00715},
+  eprinttype = {arXiv},
+  eprint = {2009.00715},
+  timestamp = {Wed, 16 Sep 2020 15:27:56 +0200},
+  biburl = {https://dblp.org/rec/journals/corr/abs-2009-00715.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{Background, 
+author = {Vanderwiel, Steven P. and Lilja, David J.}, title = {Data prefetch mechanisms}, 
+year = {2000}, 
+issue_date = {June 2000}, 
+publisher = {Association for Computing Machinery}, address = {New York, NY, USA}, 
+volume = {32}, 
+number = {2}, 
+issn = {0360-0300}, 
+url = {https://doi.org/10.1145/358923.358939}, 
+doi = {10.1145/358923.358939}, 
+journal = {ACM Comput. Surv.}, 
+month = {jun}, 
+pages = {174–199}, 
+numpages = 
+{26}, 
+keywords = 
+{memory latency, prefetching} 
+}
+
+@article{Pugsley2014SandboxPS,
+  title={Sandbox Prefetching: Safe run-time evaluation of aggressive prefetchers},
+  author={Seth H. Pugsley and Zeshan A. Chishti and Chris Wilkerson and Peng-fei Chuang and Robert L. Scott and Aamer Jaleel and Shih-Lien Lu and Kingsum Chow and Rajeev Balasubramonian},
+  journal={2014 IEEE 20th International Symposium on High Performance Computer Architecture (HPCA)},
+  year={2014},
+  pages={626-637},
+  url={https://api.semanticscholar.org/CorpusID:14318296}
+}
+
+@article{Multi-Lookahead,
+    author = {Shakerinava, M and others},
+    title = {Multi-Lookahead Offset Prefetching},
+    journal = {International Symposium on Computer Architecture (ISCA)},
+    year = {2019},
+    url = {https://dpc3.compas.cs.stonybrook.edu/pdfs/Multi_lookahead.pdf}
+}
+
+@article{BOP_2015,
+    author = {Michaud, Pierre},
+    title = {A Best-Offset Prefetcher},
+    journal = {DPC2},
+    year = {2015},
+    url = {https://comparch-conf.gatech.edu/dpc2/resource/dpc2_michaud.pdf}
+}
+
+@article{BOP_2016,
+    author = {Michaud, Pierre},
+    title = {Best-Offset Hardware Prefetching},
+    journal = {International Symposium on High-Performance Computer Architecture},
+    year = {2016},
+    url = {https://inria.hal.science/hal-01254863/document}
+}
+
+@misc{spec2017gccs,
+    author = {Stallman, Richard and others},
+    title = {602.gcc\_s, SPEC CPU®2017 Benchmark Description},
+    publisher = {Standard Performance Evaluation Corporation (SPEC®)},
+    year = {2017},
+    note = {\url{https://www.spec.org/cpu2017/Docs/benchmarks/602.gcc_s.html}, last updated: 2020-09-23},
+    url = {https://www.spec.org/cpu2017/Docs/benchmarks/602.gcc_s.html}
+}
+
+@book{Textbook, 
+author = {Hennessy, John L. and Patterson, David A.}, 
+title = {Computer Architecture, Sixth Edition: A Quantitative Approach}, year = {2017}, 
+isbn = {0128119055}, 
+publisher = {Morgan Kaufmann Publishers Inc.}, 
+address = {San Francisco, CA, USA}, 
+edition = {6th}
+}
+
+@article{Cache_pollution,
+    author = {Casmira,J.P. and Kaeli, D. R},
+    title = {Modeling cache pollution},
+    journal = {In Proceedings of the Second IASTED Conference on Modeling and Simulation},
+    year = {1995},
+    pages = {123-126}
+}
+
+%10.1145/358923.358939
+@article{wiel_lilja_2000_data_prefetch_mechanisms,
+author = {Vanderwiel, Steven P. and Lilja, David J.},
+title = {Data prefetch mechanisms},
+year = {2000},
+issue_date = {June 2000},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {32},
+number = {2},
+issn = {0360-0300},
+url = {https://doi.org/10.1145/358923.358939},
+doi = {10.1145/358923.358939},
+abstract = {The expanding gap between microprocessor and DRAM performance has 
+necessitated the use of increasingly aggressive techniques designed to reduce or hide the latency of main memory access. Although large cache hierarchies have proven to be effective in reducing this latency for the most frequently used data, it is still not uncommon for many programs to spend more than half their run times stalled on memory requests. Data prefetching has been proposed as a technique for hiding the access latency of data referencing patterns that defeat caching strategies. Rather than waiting for a cache miss to initiate a memory fetch, data prefetching anticipates such misses and issues a fetch to the memory system in advance of the actual memory reference. To be effective, prefetching must be  implemented in such a way that prefetches are timely, useful, and introduce little overhead. Secondary effects such as cache pollution and increased memory bandwidth requirements must also be taken into consideration. Despite these obstacles, prefetching has the potential to significantly improve overall program execution time by overlapping computation with memory accesses. Prefetching strategies are diverse, and no single strategy has yet been proposed that provides optimal performance. The following survey examines several alternative approaches, and discusses the design tradeoffs involved when implementing a data prefetch strategy.},
+journal = {ACM Comput. Surv.},
+month = {jun},
+pages = {174–199},
+numpages = {26},
+keywords = {memory latency, prefetching}
+}
+
+%10.1145/3470496.3527398
+@inproceedings{intel_register_file_prefetching,
+author = {Shukla, Sudhanshu and Bandishte, Sumeet and Gaur, Jayesh and Subramoney, Sreenivas},
+title = {Register file prefetching},
+year = {2022},
+isbn = {9781450386104},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3470496.3527398},
+doi = {10.1145/3470496.3527398},
+abstract = {The memory wall continues to limit the performance of modern out-of-order (OOO) processors, despite the expensive provisioning of large multi-level caches and advancements in memory prefetching. In this paper, we put forth an important observation that the memory wall is not monolithic, but is constituted of many latency walls arising due to the latency of each tier of cache/memory. Our results show that even though level-1 (L1) data cache latency is nearly 40X lower than main memory latency, mitigating this latency offers a very similar performance opportunity as the more widely studied, main memory latency.This motivates our proposal Register File Prefetch (RFP) that intelligently utilizes the existing OOO scheduling pipeline and available L1 data cache/Register File bandwidth to successfully prefetch 43.4\% of load requests from the L1 cache to the Register File. Simulation results on 65 diverse workloads show that this translates to 3.1\% performance gain over a baseline with parameters similar to Intel Tiger Lake processor, which further increases to 5.7\% for a futuristic up-scaled core. We also contrast and differentiate register file prefetching from techniques like load value and address prediction that enhance performance by speculatively breaking data dependencies. Our analysis shows that RFP is synergistic with value prediction, with both the features together delivering 4.1\% average performance improvement, which is significantly higher than the 2.2\% performance gain obtained from just doing value prediction.},
+booktitle = {Proceedings of the 49th Annual International Symposium on Computer Architecture},
+pages = {410–423},
+numpages = {14},
+keywords = {value prediction, pipeline prefetching, microarchitecture, load value prefetching, address prediction},
+location = {New York, New York},
+series = {ISCA '22}
+}

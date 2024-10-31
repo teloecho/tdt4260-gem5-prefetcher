@@ -1,0 +1,54 @@
+# Prefetcher Examples
+
+Spatial Memory Streaming
+Bingo
+Best-Offset Prefetcher
+Multi-Lookahead Offset Prefetching
+Slim AMPM
+
+
+# Paper Collection
+
+DPC1, 2009-03
+https://jilp.org/dpc/online/DPC-1%20Program.htm
+Final Results: https://jilp.org/dpc/online/slides/DPC1-results-summary.pdf
+
+
+DPC2, 2015-03
+https://comparch-conf.gatech.edu/dpc2/final_program.html
+Final Results: http://comparch-conf.gatech.edu/dpc2/resource/final.pptx
+
+
+DPC3, 2019-05
+https://dpc3.compas.cs.stonybrook.edu/?final_programs
+Final Results: https://dpc3.compas.cs.stonybrook.edu/slides/dpc3_closing.pdf
+
+1.
+L2 cache prefetcher implementation
+A Best-Offset Prefetcher - 1st place DPC2
+https://comparch-conf.gatech.edu/dpc2/resource/dpc2_michaud.pdf
+https://inria.hal.science/hal-01254863/document
+-I think we should try to implement this!
+
+2.
+L1 cache prefetcher implementation
+Multi-Lookahead Offset Prefetching - 3rd place DPC3
+https://dpc3.compas.cs.stonybrook.edu/pdfs/Multi_lookahead.pdf
+
+3.
+Boomerang: A Metadata-Free Architecture for Control Flow Delivery
+https://ieeexplore.ieee.org/document/7920850
+- only instruction and BTB cache preftching
+
+
+4.
+Data prefetch mechanisms
+https://dl.acm.org/doi/abs/10.1145/358923.358939
+
+5.
+A Survey on Recent Hardware Data Prefetching Approaches with An Emphasis on Servers
+https://arxiv.org/abs/2009.00715
+- emphasis on servers??
+"SMS is a state-of-the-art spatial prefetcher"
+"Offset prefetchers have been shown to offer significant performance benefits while imposing small storage and logic overheads [109, 110].
+"

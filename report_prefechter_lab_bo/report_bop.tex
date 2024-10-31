@@ -1,0 +1,648 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+
+\newcommand{\pluseq}{\mathrel{+}=}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{pgf} % for including pgf versions of matplotlib figures
+%\usepackage{lmodern} % maybe for using math font in mpl figures
+%\usepackage{makecell} % for linebreaks in table cells https://tex.stackexchange.com/questions/2441/how-to-add-a-forced-line-break-inside-a-table-cell#176780
+\usepackage{array} % required for text wrapping in tables
+
+\usepackage{caption} % for subfigures
+\usepackage{subcaption} % for subfigures
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\bibliographystyle{ieeetr} %apalike 
+
+
+\begin{document}
+
+\title{TDT4260 Computer Architecture\\
+Prefetcher Lab Report\\
+Best-Offset Prefetcher\\
+{\footnotesize 2024-03-22}
+}
+
+\author{
+\IEEEauthorblockN{
+Øystein B. Weibell
+}
+\IEEEauthorblockA{
+\href{mailto:oystein.b.weibell@ntnu.no}
+{oystein.b.weibell@ntnu.no}
+}
+\and
+\IEEEauthorblockN{
+Jonathan H. Kretschmer
+}
+\IEEEauthorblockA{
+\href{mailto:jonathan.kretschmer@mailbox.tu-dresden.de}
+{jonathan.kretschmer@mailbox.tu-dresden.de}
+}
+}
+% TODO give credits to our teachers and reviewers!
+
+\maketitle
+
+\begin{abstract}
+Hardware prefetchers can improve performance of modern computer systems by mitigating impacts of memory latency.
+Many approaches for prefetchers exist, even for the offset prefetching family.
+We decide to study thoroughly Best Offset (BO) Prefetching \cite{BOP_2016} in our paper.
+Its complexity is quite small, also requiring little hardware overhead but it still performs well.
+
+This work provides an in depth study on how the BO learning algorithm works.
+We implement the BO Prefechter (BOP) according to the paper in our own environment.
+In order to find the best performing BO parameters with respect to
+instructions per cycle (IPC), accuracy and coverage
+we run a bunch of simulations over several parameters with a specific workload.
+
+We yield a speedup of 2.44 versus no hardware prefetching on our chosen benchmark.
+It is also outperforming a tagged next-line prefetching scheme\cite{wiel_lilja_2000_data_prefetch_mechanisms} by generating a speedup of 1.31.
+Our overall simulation results confirm several properties of the BOP.
+For example when tuning parameters for timeliness, a bit of IPC is sacrificed.
+They also show which trade-offs designers might be faced with, when choosing parameters like offset list, SCORE\_MAX or RR table size.
+\end{abstract}
+
+%\begin{IEEEkeywords}
+%direct mapped, set-associative, cache, matrix multiplication
+%\end{IEEEkeywords}
+
+\section{Introduction} % Øystein
+
+%\subsection{The memory latency problem}
+Hardware prefetchers play a crucial role in enhancing the performance of modern computer systems by mitigating the impact of memory latency.
+%Their goal is to fetch likely cache lines into a cache level before they are actually demand requested by the processor. %maybe skip
+%Memory access times can significantly affect program execution, as processors often spend valuable clock cycles waiting for data to be fetched from memory.
+In some cases, even with "large cache hierarchies [\dots] it is still not uncommon for many programs to spend more than half their run times stalled on memory requests"\cite{Background}.
+Prefetchers are designed to anticipate future data needs and proactively bring them into the cache, thus reducing the latency associated with memory accesses and the subsequent stalls.
+
+The history of prefetchers goes back into the last several decades from simple next-line prefetching  over to strided prefeching \cite{wiel_lilja_2000_data_prefetch_mechanisms} and many more proposals.
+We focus our search on the last decade though to cover nearly state-of-the-art approaches.
+
+Introduced by Michaud\cite{BOP_2016}, the Best-Offset (BO) prefetcher is a notable example of offset prefetching.
+They won with their submission \cite{BOP_2015} the Second Data Prefetching Championship (DPC2) in 2015.
+It tackles the challenge of determining the best prefetch offset dynamically. The BO prefetcher employs a learning algorithm to assess different offsets, considering recent memory access history. This adaptability ensures that the prefetcher can adjust to changing program behaviours and varying latencies in the memory hierarchy.
+
+In comparison to the more complex Multi-Lookahead Offset Prefetching (MLOP)\cite{Multi-Lookahead} introduced by Shakerinava, M et al. at the Third Data Prefetching Championship (DPC3), which we also considered implementing, the BO only chooses a single "best offset" after each evaluation period.
+This requires less complex hardware and makes it more feasible to implement and evaluate in the gem5 simulator,
+since it is a bit leaner and more straight forward.
+Thus, it seemed like a good choice when we consider the potential learning outcome and probability of making it functional.
+
+%\subsection{Paper outline}
+This paper starts by introducing some core concepts and pitfalls when it comes to prefetchers and their implementation. It then moves on to a class of prefetchers known as Offset Prefetching, including a specific example, the Best-Offset (BO) prefetcher\cite{BOP_2016}. Finally, a modified version of the BO is presented.
+The section \textit{Methodology} goes into the experimental environment and ensures that the \textit{Results} we obtain can be replicated by others.
+The \textit{Discussion} elaborates on potential experimental fallacies and dead-ends we met along the road. Finally, similar prefetchers and experiments are presented in \textit{Related works}, to put this paper in a broader research context.
+
+\section{Background} % Øystein
+
+\subsection{Memory access patterns}
+Various memory access patterns influence the effectiveness of prefetching mechanisms. These patterns include, but are not limited to, sequential access, strided access, and interleaved access.
+
+\begin{itemize}
+    \item \textbf{Sequential Access}: In this pattern, memory addresses are accessed in a continuous sequence (0, 1, 2, 3, ...). A next-line prefetcher, for example, can effectively prefetch the next line in the sequence, ensuring high coverage and accuracy.
+    \item \textbf{Strided Access}: A strided access pattern involves accessing memory with a constant stride between addresses (0, 2, 4, 6, ...). Traditional next-line prefetchers may not be as effective in this scenario, but an offset prefetcher with an appropriate offset value can improve coverage and accuracy.
+    \item \textbf{Interleaved Access}: Multiple streams of memory access, as seen in interleaved patterns, present challenges for prefetching. Each stream may require a different offset to achieve optimal coverage.
+
+\end{itemize}
+
+\subsection{Challenges and Latency Considerations}
+
+While prefetching can enhance coverage, accuracy, and overall system performance, challenges arise due to varying memory hierarchies and access latencies. Prefetching mechanisms must consider not only covering as much useful data as possible, but also delivering it in a timely manner to avoid performance degradation\cite{Background}.
+
+\begin{itemize}
+    \item \textbf{Latency Variability}: The latency of memory access can vary based on factors such as cache levels and whether the prefetch is a hit or a miss. Prefetchers need to adapt to this variability to provide timely data.
+    \item \textbf{Optimal Offset}: Finding the optimal prefetch offset is a non-trivial task. It requires dynamically adjusting the offset based on the application's memory access behaviour. A fixed offset may not suffice for diverse program behaviours.
+    \item \textbf{Cache pollution}: "A prematurely prefetched block may also displace data in the cache that is currently in use by the processor, resulting in what is known as cache pollution"\cite{Cache_pollution}. "A prefetch that causes a miss in the cache that would not have occurred if prefetching was not in use is defined as cache pollution"\cite{Background}.
+\end{itemize}
+
+
+The following two sections describe the general idea of Offset Prefetching and Best-Offset Prefetching from Michaud\cite{BOP_2016}.
+We follow their structure and wording, but add some illustrating examples
+and highlight simplifications we take for our implementation.
+
+\subsection{Offset Prefetching}
+
+Michaud\cite{BOP_2016} introduces offset prefetching as a generalisation of next-line prefetching.
+
+On every core request to a line $X$ (i.e. L2 cache miss or prefetch-hit to line $X$),
+an offset-prefetcher prefetches line $X+D$.
+The invokation scheme can be classified as \textit{tagged sequential prefetching} according to VanderWiel and Lilja \cite{wiel_lilja_2000_data_prefetch_mechanisms}.
+
+$D$ is the \textit{prefetch offset}.
+The case $D = 1$ corresponds to next-line prefetching.
+the case of arbitrary $D$, corresponds to offset prefetching.
+
+The optimal prefetch offset depends on the memory access pattern of an application.
+Consider three different line access patterns:
+
+\begin{enumerate}
+    \item sequential: \texttt{0,1,2,3,4,...}
+    \item stride=2: \texttt{0,2,4,6,8,...}
+    \item{combined pattern: \texttt{0,3,4,6,8,9,12,...}
+    \begin{itemize}
+        \item part a: stride=3: \texttt{0,3,6,9,12,...}
+        \item part b: stride=4: \texttt{0,4,8,12,...}
+    \end{itemize}
+    }
+\end{enumerate}
+
+Ignoring the latency of the memory hierarchy
+$D = 1$ yields 100\% coverage for pattern 1),
+$D = 2$ yields 100\% coverage for pattern 2) and
+$D = 3*4 = 12$ yields 100\% coverage for pattern 3).
+
+But this naive chosen offsets do not take timeliness into account.
+Especially when these accesses have a high frequency and
+the L3 cache respective main memory have a significant latency, as it is the case on real hardware.
+This latency can vary between tens and hundreds of clock cycles \cite[p.~20]{Textbook}.
+
+A \textit{multiple} of the naively chosen offset
+instead may achieve timely \textit{and} covering prefetches for real applications on real systems.
+
+A very resource efficient algorithm to determine such offsets is given by Michaud's Best-Offset Prefetcher\cite{BOP_2016}.
+
+\section{Best-Offset (BO) Prefetcher}
+
+% TODO: devide into more sections
+
+A BO prefetcher is, above all, an offset prefetcher.
+It prefetches with the \textit{current} prefetch offset $D$.
+So on every L2 miss or prefetch hit on line $X$, it prefetches line $X+D$.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\columnwidth]{figures/michaud_bop_2016_schematic_view_of_bo_prefetcher.png}
+    \caption{Schematic view of a BO prefetcher. \cite{BOP_2016}}
+    \label{fig:bo-schematic}
+\end{figure}
+
+
+A schematic view of a BO is given in Figure \ref{fig:bo-schematic}.
+
+\subsection{Best-offset learning}
+
+To determine a best offset that may replace the \textit{current} prefetch offset $D$,
+the best-offset learning algorithm is employed (Section 4.1 \cite{BOP_2016}): 
+
+"[It] tries to find the best prefetch offset by testing several different offsets.
+An offset d is potentially a good prefetch offset if,
+when line $X$ is accessed,
+there was in the recent past a previous access for line $X - d$.
+However, the fact that $X - d$ was recently accessed
+is not sufficient for guaranteeing that line $X$ would have been prefetched in time.
+We want prefetches to be timely whenever possible.
+I.e., for d to be a good prefetch offset for line $X$,
+line $X - d$ must have been accessed recently, but not too recently.
+Ideally, the time between the accesses to lines $X - d$ and $X$
+should be greater than the latency for completing a prefetch request.
+
+\subsection{RR table}
+
+[Michaud's] solution is to record in a \textit{recent requests} (RR) table
+the \textit{base address} of prefetch requests that have been \textbf{completed}"\cite{BOP_2016}.
+
+The base address is defined as $Y - D$, where $Y$ is a prefetched line that is ready to be placed in L2 cache.
+Vice versa you can think i.e. of a L2 prefetched hit on line $X'$ 20 clock cycles ago.
+Then our overall offset prefetcher issues an prefetch for $X' + D$.
+Due to L3 latency, this prefetched line $X' + D$ arrives at first after 20 clock cycles in the fill queue from L3.
+Then $Y = X' + D$ and the prefeched-bit of that inserted line is set.
+Now we know that $Y - D$ must have been a useful for L1 some clock cycles ago (recently).
+That's why this base address $X' = Y - D$ is inserted into the recent requests (RR) table.
+
+This late insert implicitly holds information about the L3 latency.
+
+If a line $X - d$ is in the RR table, it implies,
+that d would have been an offset that would have prefetched line $X$ in a timely manner.
+
+\subsection{Offset list}
+
+"Besides the RR table, the BO prefetcher features an \textit{offset list} and
+a \textit{score} table. The score table associates a score with
+every offset in the offset list. The score value is between 0
+and SCOREMAX [\dots].
+
+The prefetch offset is updated at the end of every \textit{learning phase}.
+A learning phase consists of several \textit{rounds}. At the
+start of a learning phase, all the scores are reset to 0.
+On every eligible L2 read access (miss or prefetched hit), we test
+an offset $d_i$ from the list. If $X - d_i$ hits in the RR table, the
+score of offset $d_i$ is incremented.
+During a round, each offset in the list is tested once:
+we test $d_1$ on the first access in the round,
+$d_2$ on the next access, then $d_3$, and so on.
+When all the offsets in the list have been tested, the current round is
+finished, and a new round begins from offset $d_1$ again."\cite{BOP_2016}
+
+
+In the appended section \ref{sec:appendix_bo_learning_example} we present two examples, illustrating how the best learning algorithm is scoring good offsets higher.
+
+\subsection{The end of a learning phase}
+
+"The current learning phase finishes at the end of a round
+when either of the two following events happens first: one
+of the scores equals SCOREMAX, or the number of rounds
+equals ROUNDMAX (a fixed parameter). When the learning phase is finished, we search the best offset, i.e., the one
+with the highest score3 . This offset becomes the new prefetch
+offset, and a new learning phase starts."\cite{BOP_2016}
+
+\subsection{Prefetch throttling}
+
+Prefetching with a fixed offset on very irregular workloads might not be efficient,
+with respect to prefetch accuracy. This can result in replacement of useful cache lines.
+
+Therefore the BO prefetcher employes a metric for switching off prefetching.
+When no score is above a threshold BADSCORE after a finished learning phase, prefetching is switched off.
+
+But the BO learning proceeds.
+Figure \ref{fig:bo-schematic} illustrates the case for prefetching enabled.
+But now the tag itself (Y-0) filled into L2 is always added to RR table - not just if it is a prefetched fill.
+
+
+\section{Implementation: Our Best-Offset Prefetcher}
+%explain implementation details so others can reproduce the prefetcher
+%good figures can be valuable! (block diagram, state machine/ transistions...)
+
+\subsection{Configuration parameters}
+
+We declare several configuration parameters: \texttt{SCORE\_MAX}, \texttt{ROUND\_MAX} and \texttt{BAD\_SCORE}.
+In addition we define \texttt{NUMBER\_OF\_OFFSETS} and \texttt{RR\_SIZE}, to be able
+to perform simulations with a subset of the offset-list and different RR table sizes.
+
+\subsection{Offset list}
+
+The authors of the paper \cite{BOP_2016} use a list of prefetch offsets between 1 and 256, where $d \in \{2^i*3^j*5^k\}$.
+The BO prefetcher is not prefetching accross page boundaries. Our system has 64B cache lines and we assume 4KiB pages.
+But according to the paper the BO prefetcher does not prefetch across page boundaries.
+Therefore we limit the offsets to be smaller than 64.
+Then our offset list consists of 26 entries:
+1,2,3,4,
+5,6,8,9,
+10,12,15,16,
+18,20,24,25,
+27,30,32,36,
+40,45,48,50,
+54,60.
+
+\subsection{Internal State}
+First of all the internal state consists of the currently used \texttt{bestOffset} for prefetching.
+
+The paper states that several implementations of the \textit{RR table} are possible.
+For the sake of simplicity we decided against modelling a direct-mapped like cache, accessed through a hash function, as proposed by the paper.
+Instead we imitate a simple ring buffer, by using a double-ended queue (\texttt{std::deque} of \texttt{int}), to implement the recent requests list.
+
+
+Furthermore a \textit{flag} that is indicating whether prefetching is \textit{enabled} and
+counters for the \texttt{round} and
+the \texttt{subround}. The latter one is corresponding to $i$ pointing to the offset $d_i$ to be tested on one eligible L2 access and is incremented on every access.
+The \texttt{subround} counter is beeing reset when it is equal to \texttt{NUMBER\_OF\_OFFSETS}.
+The \texttt{round} counter is reset when the end of a learning phase is reached. (See section Best Offset Learning).
+
+
+\subsection{Functions}
+
+Our implementation derives from the gem5 \texttt{Queued : Base} prefetcher.
+
+In order to model the tagged prefetching behaviour and making sure the method \texttt{calculatePrefetch} is beeing invoked only on L2 read accesses that are misses or prefetched hits,
+we set the \texttt{Base} prefetcher parameters
+\texttt{on\_miss}, \texttt{on\_read}, \texttt{on\_data}, \texttt{on\_inst} and \texttt{prefetch\_on\_pf\_hit}) to \textit{true},
+and \texttt{on\_write} and \texttt{prefetch\_on\_access} to \textit{false}.
+
+We also implement methods \texttt{notifyFill} and \texttt{notifyPrefetchFill} that are beeing invoked
+when a cache line from L3 is filled into L2 cache, the latter one only when the line has been prefetched. This is required by the scheme (see figure \ref{fig:bo-schematic}).
+
+The implementation of the event listener for \texttt{notifyPrefetchFill} has been provided by our teachers. (https://github.com/davidmetz/gem5-tdt4260/tree/student)
+
+\subsection{Ressource usage}
+
+The BO prefetcher generally has a small hardware overhead \cite{BOP_2016}.
+In addition to the (very small) offset prefetching overhead,
+just a bit of bookkeeping for recent requests and scores is required.
+%For example it does not require an extra prefetch buffer, but prefetched lines as well as demand misses are placed (via the MSHR buffer) directly into the L2 cache.
+
+However for the sake of a readable implementation we use software data structures that were not meaningfully directly implemented in hardware, for example the \texttt{deque} and the \texttt{vector}.
+Instead the RR table might be represented for example by a little cache providing hits or misses and indexed by a hash function \cite{BOP_2016}. This reduces memory usage significantly in contrast to saving the pure full addresses.
+Also the offset list might be hard-coded in read only memory (ROM).
+
+\subsection{Environment}
+
+We made only few adjustments to the provided baseline architecture configuration of gem5. It has been provided to us by our teachers.\footnote{available under https://github.com/davidmetz/gem5-tdt4260/tree/student}
+It comes with a single out-of-order O3 CPU. The system is modelled according to parameters published by Intel in their "Register file prefetching" paper \cite{intel_register_file_prefetching} to match an Intel Ice Lake CPU.
+The L1 data cache size is 48KiB, associativity 12; L1 instruction cache size is 32KiB; L2 cache size is 1280KiB, associativity 20; and L3 cache size is 3MiB, associativity 12.
+The cache line size is 64B.
+
+We disable hardware prefetching except for the L2 cache, where we employ our Best Offset prefetcher.
+
+\section{Methodology}
+%Is a methodology recognizable? Which ones were used? How were the results obtained and analyzed? Are they reproducible? What is the significance and are their possible problems or error sources?
+
+We want to find the best performing configuration of BO parameters on our system for a given workload.
+
+We measure performance by instructions per cycle (IPC), accuracy\footnote{Measures the number of useful prefetches issued by the prefetcher.} and
+coverage.\footnote{How many of the potential candidates for prefetches were actually identified by the prefetcher?}.
+All these performance parameters are being generated automatically on a run of the provided \texttt{run\_prefetcher.py} script.
+
+Due to time constraints we limit our search on three changed parameters and only one benchmark.
+
+We utilise the provided SPEC2017 gcc\_s benchmark\cite{spec2017gccs}.
+The prefetcher is employed and the statistics are being generated after some warm-up of the benchmark.
+The number of instructions executed by the simulator is limited to $10\,\text{million}$.
+
+In accordance to \cite[table 2]{BOP_2016} we keep following parameters fixed: $\texttt{ROUND\_MAX} = 100$ and $\texttt{BAD\_SCORE} = 1$.
+But we change simulate over differing RR table size, offsets and \texttt{SOCRE\_MAX}:
+\begin{itemize}
+    \item $\texttt{RR\_SIZE} = \{16, 32, 64, 128, 256\}$
+    \item a subset (just the first 16 entries) and the full offset list\footnote{$\texttt{NUMBER\_OF\_OFFSETS} = \{16, 26\}$}
+    \item $\texttt{SCORE\_MAX} = \{1,2,\dots,100\}$
+\end{itemize}
+This gives a total of $2 * 5 * 100 = 1000\,\text{simulations}$.
+
+
+%testing-scheme: which simulations and what benchmarks and why?
+%which peformance metrics to choose (accuracy, coverage, speed, ...)
+
+
+\section{Results}
+%How extensive was the benchmarking? Were different parameters or implementations used? Were there tests of other than already provided benchmarks (optional!)? Are the results well presented (figures, tables)?
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|>{\raggedright\arraybackslash}p{0.13\columnwidth}|>{\raggedright\arraybackslash}p{0.13\linewidth}|>{\raggedright\arraybackslash}p{0.13\linewidth}|>{\raggedright\arraybackslash}p{0.13\linewidth}|} \hline 
+                  & No Prefetcher  & Tagged Next-Line & BO Maximise IPC     & BO Maximise Accuracy \\ \hline %& BO Maximise Coverage \\ \hline 
+         IPC      & 0.236531       & 0.441386         & \textbf{0.577577}   & 0.522890             \\ \hline %& 0.576559             \\ \hline 
+         Speedup  & 1.000000       & 1.866081         & \textbf{2.441866}   & 2.210662             \\ \hline %& 2.437562             \\ \hline 
+         Accuracy & n/a            & 0.366883         & 0.899859            & \textbf{0.920615}    \\ \hline %& 0.910683             \\ \hline 
+         Coverage & n/a            & 0.901658         & 0.715169            & 0.670101             \\ \hline %& \textbf{0.715780}    \\ \hline
+         \texttt{RR\_SIZE}   & n/a & n/a              & 16                  & 64                   \\ \hline %& 16                   \\ \hline
+         \texttt{SCORE\_MAX} & n/a & n/a              & 7                   & 55                   \\ \hline %& 10                   \\ \hline
+         Offsets  & n/a            & n/a              & all 26              & just 16              \\ \hline %& all 26               \\ \hline
+    \end{tabular}
+    \caption{Comparison of the best performing BO prefetcher configurations against a reference with no prefetching and simple next-line prefetching. Benchmark: gcc\_s, $\texttt{ROUND\_MAX} = 100$ and $\texttt{BAD\_SCORE} = 1$}
+    \label{tab:best_parameters}
+\end{table}
+% REFERENCE-NO-PREFECHING:
+% IPC: 0.236531
+% Accuracy: n/a
+% Coverage: n/a
+% REFERENCE-TAGGED-NEXT-LINE-PF:
+% IPC: 0.441386
+% Accuracy: 0.366883
+% Coverage: 0.901658
+% BEST-OFFSET:
+% -----
+% Best IPC: 0.577577
+% Accuracy: 0.899859
+% Coverage: 0.715169
+% Scoremax: 7
+% Folder:   RR16offsets26
+% -----
+% IPC:           0.522890
+% Best accuracy: 0.920615
+% Coverage:      0.670101
+% Scoremax: 55
+% Folder:   RR64offsets16
+% -----
+% IPC:           0.576559
+% Accuracy:      0.910683
+% Best coverage: 0.715780
+% Scoremax: 10
+% Folder:   RR16offsets26
+% -----
+% Best product: 0.65408147232
+% IPC:          0.574317
+% Accuracy:     0.91536
+% Coverage:     0.714562
+% Scoremax: 14
+% Folder:   RR16offsets26
+
+Table \ref{tab:best_parameters} presents the best performing configurations found with the simulations.
+Additionally we make some interesting observations.
+
+Coverage and IPC are strongly correlated as you can see in figure \ref{fig:accuracy_coverage_ipc_full_offset_list_rr_16_32_64}.
+Therefore we omit a column showing the results for maximising coverage as they are very similar to those for maximising IPC.
+
+Optimising for IPC, accuracy or coverage may result in quite different BO parameters.
+BO can easily outperform next-line with respect to IPC and accuracy but not with respect to coverage.
+
+When maximising accuracy we encounter a more worse IPC. A bigger RR table and the smaller offset subset are beneficial for accuracy.
+
+When maximising IPC we encounter $1.2\,\%$ late prefetches  in contrast to when maximising for accuracy, where we encounter just $0.6\,\%$ late prefetches.
+This confirms Michaud's statement that striving for timeliness may not always be optimal\cite[section 2.3]{BOP_2015}.
+
+Generally increasing \texttt{SCORE\_MAX} is beneficial for performance except for either small RR tables sizes (see figure \ref{subfig:RR=16_offsets=26}) or less number of offsets (see figure \ref{subfig:RR=64_Coverage}, blue line).
+
+%TODO: what is the best performing config with respect to IPC, accuracy and coverage -> table
+
+We also saw that using a smaller set of offsets is very beneficial.
+See figure \ref{fig:comparision_different_offsets} where for a sufficiently large RR table size and the small offset set ($\leq 25$), any chosen \texttt{SCORE\_MAX} is outperforming the full set of offsets ($\leq 60$).
+This may be caused firstly by smaller offsets generally being beneficial for performance (ignoring timeliness) and secondly by the relatively high \texttt{ROUND\_MAX} parameter. With less number of offsets the prefetcher might become more flexible on changing request patterns because learning phases become shorter.
+
+It turned out that performance for RR tables larger than 64 entries is stays quite similar or is even degrading.
+We omit related figures.
+The degrading effect may come from the BO algorithm wrongly scoring offsets that only satisfy \textit{out-dated} request patterns.
+Therefore the RR table should be choosen not too large\cite[section 3.1]{Multi-Lookahead}.
+
+
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{1.0\columnwidth}
+         \centering
+         %\includegraphics[width=\columnwidth]{graph1}
+         \resizebox{1.0\columnwidth}{!}{\input{figures/RR=16_offsets=26.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 16$, NOTE: This specific simulation terminated at score max 65. We could not figure out why, yet.}
+         \label{subfig:RR=16_offsets=26}
+     \end{subfigure}
+     \vfill
+     \begin{subfigure}[b]{1.0\columnwidth}
+         \centering
+         %\includegraphics[width=\columnwidth]{graph2}
+         \resizebox{1.0\columnwidth}{!}{\input{figures/RR=32_offsets=26.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 32$}
+         \label{subfig:RR=32_offsets=26}
+     \end{subfigure}
+     \vfill
+     \begin{subfigure}[b]{1.0\columnwidth}
+         \centering
+         %\includegraphics[width=\columnwidth]{graph2}
+         \resizebox{1.0\columnwidth}{!}{\input{figures/RR=64_offsets=26.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 64$}
+         \label{subfig:RR=64_offsets=26}
+     \end{subfigure}
+     \caption{Accuracy, Coverage and IPC plotted over varying \texttt{SCORE\_MAX}. Full 26-entries offset list is being used. When \texttt{SCORE\_MAX} is approaching \texttt{ROUND\_MAX} some sort of saturation is happening.}
+     \label{fig:accuracy_coverage_ipc_full_offset_list_rr_16_32_64}
+\end{figure}
+%RR=16_offsets=26
+%RR=32_offsets=26
+%RR=64_offsets=26
+%--RR=256_offsets=26-- -> comment: it is not changing a lot anymore...
+
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.49\columnwidth}
+         \centering
+         \resizebox{1.15\columnwidth}{!}{\input{figures/RR=16_Accuracy.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 16$}
+         \label{subfig:RR=16_Accuracy}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\columnwidth}
+         \centering
+         \resizebox{1.15\columnwidth}{!}{\input{figures/RR=64_Accuracy.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 64$}
+         \label{subfig:RR=64_Accuracy}
+     \end{subfigure}
+     \vfill
+     \begin{subfigure}[b]{0.49\columnwidth}
+         \centering
+         \resizebox{1.15\columnwidth}{!}{\input{figures/RR=16_Coverage.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 16$}
+         \label{subfig:RR=16_Coverage}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\columnwidth}
+         \centering
+         \resizebox{1.15\columnwidth}{!}{\input{figures/RR=64_Coverage.pgf}}
+         \caption{$\texttt{RR\_SIZE} = 64$}
+         \label{subfig:RR=64_Coverage}
+     \end{subfigure}
+     \caption{Accuracy (upper part) and Coverage (lower part) plotted over varying \texttt{SCORE\_MAX}. Blue: 16 offsets; Orange: 26 offsets. Especially for bigger RR table size, greater offsets seem to worsen the prefetching performance.}
+     \label{fig:comparision_different_offsets}
+\end{figure}
+%RR=16_Accuracy ; RR=16_Coverage
+%RR=64_Accuracy ; RR=64_Coverage
+
+\section{Discussion}
+%Are the results discussed? How does the behaviour of different benchmarks impact the results? What is the impact of different parameters or implementations on the results? Which conclusions are drawn from the results? Is their interpretation correct? Given the results, what is the evaluation of the prefetcher and is it reasonable?
+
+%we have tried following else, but it did not work
+
+%weaknesses of your scheme and highlights the strong and weak
+%points of your experimental setup
+
+The used environment tires to model a nowadays actually used CPU type.
+Also the simulations aim to cover a huge parameter space allowing to find a well performing configuration for the given experimental setup quite confidentially.
+
+On the other hand the performance of a specific BO prefetcher parameter configuration is substantially depending on the workload.
+The gcc\_s workload might not fully have a request patterns where offset prefetching might be meaning ful at all.
+Therefore just optimising for one benchmark is by far not enough.
+
+
+
+%experimental setup:
+%Strong points:
+%huge parameter space covered
+
+%weak points:
+%duplicate entries of the same tag workloads could be imagined that make the RR table useless
+
+Our implementation of the RR table is allowing duplicate entries.
+This might degrade performance on specific workloads dramatically, because the RR queue/\texttt{std::deque} might be spammed with the same address
+and the amount of information contained in the RR table would decrease.
+A sufficiently large queue might decrease the impact of duplicate fills.
+In a new iteration of the implementation, a set-like implementation (not allowing multiple duplicate entries) or maybe even a direct-mapped cache like implementation should be considered, as proposed by \cite[section 4.4]{BOP_2016}.
+
+%not measuaring which offsets have been used and correlation of parameters with why a training phase ended, what if plateau just comes from too large scoremax and training phase always stopped because of ROUND\_MAX reached
+
+
+\subsection{Resource Usage}
+%What is the impact of the prefetcher on the resource usage. How applicable is an implementation of it in a processor? Are there different sizes possible and if so what is the trade off?
+
+Allowing duplicate entries in the RR table and therefore maybe increasing the number of RR table entries is a waste prefetcher of memory.
+
+With BO prefetching we encounter a better accuracy compared to next-line prefetching.
+This implies that more prefetched lines were actually referenced by the CPU before replaced in the cache.
+Therefore cache pollution and memory bandwidth pollution is lower, resulting in less energy usage and better IPC.
+
+%douplicate entries in the RR table are a waste of memory space
+
+\section{Related Work} % Øystein (if time)
+
+In the BOP papers they refer amongst others to sandbox prefetching (SP) by Pugsley et al. \cite{Pugsley2014SandboxPS} as one of the first offset prefetchers.
+Sandbox prefetching is testing and performing prefetches with several different offsets but not taking timeliness into account \cite[section 4]{BOP_2015}.
+
+Michaud's BOP then trys to take timeliness into account and is the winner of DPC2.
+
+Later at DPC3 Shakerinava et al. propose Multi-Lookahead Offset Prefetching (MLOP)\cite{Multi-Lookahead} as an improved offset prefetcher that is trying
+to take both coverage and timeliness into account. This is achieved by considering multiple \textit{prefetching lookaheads} during the evaluation of prefetch offsets.
+
+% of course the cited BO prefetcher,
+% they also refer to sandbox prefetching and TODO
+% MLOP
+
+%briefly mention other prefetchers and their pros and cons
+%put our solution in a bigger research context
+
+
+\section{Conclusion}
+
+%This section concludes your work by briefly repeating the goal of your work %and stating the main results. It can also include planned future work.
+
+In this paper we have studied the behaviour of the BOP with different parameters.
+We could learn a lot about different quite modern prefetching techniques with little hardware overhead.
+
+Our BOP out-performs simple next-line prefetching on the gcc\_s benchmark with respect to IPC and accuracy.
+We also provide ideas on how to tune parameters.
+
+Future work should utilise more different benchmarks to model a more realistic workload.
+Also the implementation of the RR table should be refactored to fix problems that may arise from duplicated entries.
+The impact of varying the offset list and their interaction with variying RR table size might also be studied more in depth.
+
+\bibliography{bibliography.bib}
+
+\newpage
+\section{Use of AI for this work}
+
+% As such, for the final report, you have to add an extra page after references stating how AI was used for this project. You must include this page even if you didnt use AI, in which case you just state that AI was not used in any way for this project. If you used AI, clearly state what parts AI was used for, which tools were used, and ensure that the AI contributions can be clearly identified.
+
+Which parts contain contributions of AI?
+A code editor copilot has been used
+while writing code for the prefetcher implementation, especially when struggling with C/C++ details
+and for scripting python code generating diagrams from the simulation data.
+
+Which tools have been used?
+VS Code plugin \textsc{Codeium}.
+
+\newpage
+\section{Appendix: Illustrating Examples for the BO learning phase}\label{sec:appendix_bo_learning_example}
+
+We present two example executions of the learning phase.
+These show the ability of the algorithm to find good offsets in presence
+of high latencies of the L3 cache on the one hand
+and interleaved strided access patters on the other hand.
+
+First consider a 'large' L3 cache latency of 5 clock cycles and a simple access pattern \texttt{0,2,4,...} with stride 2.
+The current prefetch offset is $D=2$ and the offset list contains $d_i = 6,12,18$.
+Figure \ref{fig:bo-prefetcher-execution-high-latancy} shows the first 7 rounds of the learning phase.
+The score for offset 12 is higher than for 6 and 18. Offset 6 is too small to provide timely prefetches and 18 also not favoured at the beginning as Y - d results in base addresses that have not been requested -- 'it goes too far back in time'.
+Here the algorithm find the offset that provides timely prefetches.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\columnwidth]{figures/example_demonstrating_impact_of_high_latency.png}
+    \caption{Example prefetcher execution for a strided pattern and large latency. BO learning favours timely offsets.}
+    \label{fig:bo-prefetcher-execution-high-latancy}
+\end{figure}
+
+Secondly consider a 'negligible' L3 cache latency of 1 clock cycle, but a more complex access pattern of two interleaved patterns with strides 3 and 4.
+The current prefetch offset is $D=2$ again. The offset list contains $d_i = 1,2,3,4,12$.
+Figure \ref{fig:bo-prefetcher-execution-interleved-patterns} shows the first 7 rounds of the learning phase.
+The score for the offsets 1 and 2 are smaller than for 3 and 4. Which highlights that in at least some rounds these are considered to be a good prefetch offset.
+But after some time the prefetch offset 12 is always considered as a good prefetch offset, because it is a multiple of 3 and 4 -- the strides.
+Here the algorithm finds the offset that is a multiple of all strides.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\columnwidth]{figures/example_demonstrating_scoring_multiple_of_both_streams_higher_than_multiples_of_only_one_part.png}
+    \caption{Example prefetcher execution for interleaved access patterns. BO learning favours multiple of both strides. (NOTE: only execution for offsets 1,2,3,4,12 (lower part) is relevant)}
+    \label{fig:bo-prefetcher-execution-interleved-patterns}
+\end{figure}
+
+
+
+\end{document}
