@@ -9,7 +9,13 @@ gem5_root = os.path.abspath("../../..")
 gem5_bin = f"{gem5_root}/build/X86/gem5.opt"
 config = f"{gem5_root}/configs/tdt4260/prefetcher.py"
 
-num_benchmarks = 1
+# ["gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s"]
+# 1 ... only "gcc_s"
+# 2 ... "gcc_s", "exchange2_s"
+# etc.
+# in `configs/tdt4260/commands.txt` the order can be changed, mind to change
+# the order in b_names list either
+num_benchmarks = 2
 rrSize = 64
 roundMax = 100
 badScore = 1

@@ -6,20 +6,22 @@ The goal is to research on, understand and implement a self-chosen prefetcher.
 We dig into [Best-Offset-Prefetching as presented by Michaud](https://inria.hal.science/hal-01254863v1).
 
 The prefetcher header and implementation can be found in
-[best_offset.hh](/src/mem/cache/prefetch/best_offset.hh) and
-[best_offset.cc](/src/mem/cache/prefetch/best_offset.cc) respectively.
+[best_offset.hh](src/mem/cache/prefetch/best_offset.hh) and
+[best_offset.cc](src/mem/cache/prefetch/best_offset.cc) respectively.
+Its parameters are configured in [Prefetcher.py](src/mem/cache/prefetch/Prefetcher.py)
 Our developemnt starts on an adapted gem5 version.
 Our teachers provide the [prepared version of the gem5 repository](https://github.com/davidmetz/gem5-tdt4260),
 leaving only basic prefetchers in `src/men/cache/prefetch/`. There our develoments start. See commit history.
 
-Plotting logic for our measuements can be found in the [plot jupyter notebook](/_Plots_for_report/plot.ipynb).
+Plotting-logic for our measuements can be found in the [plot jupyter notebook](_Plots_for_report/plot.ipynb).
 
-Our [report](/report_prefechter_lab_bo/report_bop.pdf) describes the background of prefetching in general,
+Our [report](report_prefechter_lab_bo/report_bop.pdf) describes the background of prefetching in general,
 our implementation and our performance measuement results compared to less sophisticated or no prefetching.
 
 # Getting started
 
-https://www.gem5.org/documentation/general_docs/building
+See https://www.gem5.org/documentation/general_docs/building for further instructions,
+on getting gem5 dependencies installed on your machine. Here with docker, just run:
 ```bash
 # docker pull ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0
 # docker run -u $UID:$GID --volume ./:/gem5 --rm -it ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0
@@ -33,18 +35,35 @@ cd /gem5
 scons -j9 build/X86/gem5.opt
 ```
 
-Download the teachers provided excerpt of the [spec2017](https://static.teloecho.eu/tdt4260/spec2017.tar.xz)
+In order to run some benchmarks, download the teachers provided excerpt of the
+[spec2017](https://static.teloecho.eu/tdt4260/spec2017.tar.xz)
 benchmark suit ("gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s").
 And extract it to `src/tdt4260/prefetcher/spec2017`.
-See also [README/task description of prefetcher lab](/src/tdt4260/README.md).
-
 spec2017.tar.xz: [sha256sum](https://static.teloecho.eu/tdt4260/spec2017.tar.xz.sha256sum) `aae165e54e7144463ff2017ca6c5883c90791ca4395681b84e2f00c312628551`
+See also the [task description](/src/tdt4260/README.md) of prefetcher lab.
 
-Then run the simulator with the benchmarks using the `run_prefetcher.py` script. (Attention currently there are _a lot_ of simulations run after another such that it might take a hole night.) If you see `Redirecting stdout and stderr to prefetcher_out_0/simout` the second or third time, you can be somewhat sure, everything kind of works, ctrl+c,c,c,c... to stop it. Modify the script to just run a selection of configs.
+Then run the simulator (in the docker container again) with the benchmarks using the `run_prefetcher.py` script. (Attention there are _a lot_ of simulations configured to be run after another. It might take a hole night.)
+You can modify which benchmarks to run by changing the order and in `configs/tdt4260/commands.txt` and/or by limiting the simulations to the first `num_benchmarks` benchmarks by changing the corresponding variable in `run_prefetcher.py`.
+The range of SCORE_MAX to be iterated through can be modified there as well by changing the `roundMax` variable.
+
+If you see `Redirecting stdout and stderr to prefetcher_out_0/simout` the second or third time, you compilation and toolchain is working, ctrl+c,c,c,c... to stop it. Modify the script to just run a selection of configs, as described above.
 ```bash
 cd src/tdt4260/prefetcher
 python3 run_prefetcher.py
 ```
+
+Check the `src/tdt4260/prefetcher/spec2017/prefetcher_out_/*` and `src/tdt4260/prefetcher/results/`
+directories for output comparable to `_Plots_for_report/Data/` directory.
+In the `simout` file you may find more infos on what may have gone wrong with the simulation.
+
+If you see this warning in `src/tdt4260/prefetcher/spec2017/prefetcher_out_x/simout`
+```
+build/X86/mem/dram_interface.cc:690: warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (8192 Mbytes)
+```
+and no simulation results especially for `gcc_s` showing up, then your docker container's memory limit is configured too low.
+Set it to at least a bit more than **8.5 GB**.
+Go to Docker Desktop > Settings > Ressources > Memory Limit > put it to something like 18GB to be safe.
+After that rebuild and rerun the simulations.
 
 -----
 Sorry for the doubled readme files (`README.md` and `README`).

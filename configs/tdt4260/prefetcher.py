@@ -72,6 +72,11 @@ num_cpus = 1
 (cpu, mem, futureclass) = Simulation.setCPUClass(args)
 cpu.numThreads = 1
 
+# in case of warning in simout file:
+# build/X86/mem/dram_interface.cc:690: warn: DRAM device capacity
+# (16384 Mbytes) does not match the address range assigned (8192 Mbytes)
+# changing mem_ranges = [AddrRange("8GB")] does _not_ help!
+# instead see README.md for how to increase docker memory limit
 system = System(cpu = [cpu(cpu_id=0)],
                 mem_mode = mem,
                 mem_ranges = [AddrRange("8GB")],

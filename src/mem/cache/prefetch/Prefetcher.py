@@ -210,6 +210,10 @@ class BestOffsetPrefetcher(QueuedPrefetcher):
     cxx_class = 'gem5::prefetch::BestOffsetPrefetcher'
     cxx_header = "mem/cache/prefetch/best_offset.hh"
 
+    # implicit definition of parameters that can be set for each simulation in
+    # configs/tdt4260/prefetcher.py,
+    # e.g. system.l2.prefetcher.scoreMax = args.scoreMax
+    # those are then used in the constructor of BestOffsetPrefetcher
     scoreMax = Param.Int(8, "Max score")
     roundMax = Param.Int(16, "Max number of rounds")
     badScore = Param.Int(1, "Bad score")
