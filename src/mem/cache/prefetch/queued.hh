@@ -197,6 +197,11 @@ class Queued : public Base
 
     void insert(const PacketPtr &pkt, PrefetchInfo &new_pfi, int32_t priority);
 
+    /**
+     * Calculate the addresses that shall be prefetched according to the
+     * prefetch algorithm using the prefetch info pfi and put them into
+     * addresses.
+     */
     virtual void calculatePrefetch(const PrefetchInfo &pfi,
                                    std::vector<AddrPriority> &addresses) = 0;
     PacketPtr getPacket() override;
