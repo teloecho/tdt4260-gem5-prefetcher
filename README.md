@@ -16,7 +16,7 @@ leaving only basic prefetchers in `src/men/cache/prefetch/`. There our develomen
 Plotting-logic for our measuements can be found in the [plot jupyter notebook](_Plots_for_report/plot.ipynb).
 
 Our [report](report_prefechter_lab_bo/report_bop.pdf) describes the background of prefetching in general,
-our implementation and our performance measuement results compared to less sophisticated or no prefetching.
+our implementation and our performance measurement results.
 
 # Getting started
 
@@ -29,7 +29,7 @@ docker pull ghcr.io/gem5/ubuntu-22.04_all-dependencies:v23-0
 docker run -u $UID:$GID --volume ./:/gem5 --rm -it ghcr.io/gem5/ubuntu-22.04_all-dependencies:v23-0
 ```
 
-Inside the docker container run
+Inside the docker container, run
 ```bash
 cd /gem5
 scons -j9 build/X86/gem5.opt
@@ -40,7 +40,7 @@ In order to run some benchmarks, download the teachers provided excerpt of the
 benchmark suit ("gcc_s", "exchange2_s", "mcf_s", "deepsjeng_s", "x264_s", "imagick_s").
 And extract it to `src/tdt4260/prefetcher/spec2017`.
 spec2017.tar.xz: [sha256sum](https://static.teloecho.eu/tdt4260/spec2017.tar.xz.sha256sum) `aae165e54e7144463ff2017ca6c5883c90791ca4395681b84e2f00c312628551`
-See also the [task description](/src/tdt4260/README.md) of prefetcher lab.
+See also the [task description](/src/tdt4260/README.md) of the prefetcher lab.
 
 Then run the simulator (in the docker container again) with the benchmarks using the `run_prefetcher.py` script. (Attention there are _a lot_ of simulations configured to be run after another. It might take a hole night.)
 You can modify which benchmarks to run by changing the order and in `configs/tdt4260/commands.txt` and/or by limiting the simulations to the first `num_benchmarks` benchmarks by changing the corresponding variable in `run_prefetcher.py`.
@@ -67,14 +67,14 @@ After that rebuild and rerun the simulations.
 
 # Run Reference Versions (No Prefetcher and Tagged Next Line)
 
-To make transparent how the reference versions where defined,
-they tagged, `git tag` shows you the exact name.
+To make transparent how the reference versions were defined,
+they are tagged, `git tag` shows you the exact name.
 To access them, run `git checkout <tag-name>`.
 
 -----
 Sorry for the doubled readme files (`README.md` and `README`).
 Gem5 depends on the `README` file to exist for successful builds.
-# Gem5 Origianl README
+# Gem5 Original README
 
 This is the gem5 simulator.
 
