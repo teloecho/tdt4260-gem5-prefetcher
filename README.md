@@ -65,6 +65,12 @@ Set it to at least a bit more than **8.5 GB**.
 Go to Docker Desktop > Settings > Ressources > Memory Limit > put it to something like 18GB to be safe.
 After that rebuild and rerun the simulations.
 
+# Run Reference Versions (No Prefetcher and Tagged Next Line)
+
+To make transparent how the reference versions where defined,
+they tagged, `git tag` shows you the exact name.
+To access them, run `git checkout <tag-name>`.
+
 -----
 Sorry for the doubled readme files (`README.md` and `README`).
 Gem5 depends on the `README` file to exist for successful builds.
