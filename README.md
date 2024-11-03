@@ -3,7 +3,7 @@ This is our implementation, plotting code and report for the prefetcher lab of t
 course [computer architecture (TDT4260) at NTNU](https://www.ntnu.edu/studies/courses/TDT4260/2023).
 
 The goal is to research on, understand and implement a self-chosen prefetcher.
-We dig into [Best-Offset-Prefetching as presented by Michaud](https://inria.hal.science/hal-01254863v1).
+We dig into [Best-Offset-Prefetching as presented by Pierre Michaud](https://inria.hal.science/hal-01254863v1).
 
 The prefetcher header and implementation can be found in
 [best_offset.hh](src/mem/cache/prefetch/best_offset.hh) and

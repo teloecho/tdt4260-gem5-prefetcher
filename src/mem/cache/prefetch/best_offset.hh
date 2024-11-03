@@ -1,3 +1,15 @@
+/*
+ * 2024 oystebw, teloecho
+ */
+
+/**
+ * @file
+ * Header file for our implementation of a Best Offset Prefetcher following
+ * the paper of Pierre Michaud https://inria.hal.science/hal-01254863v1.
+ * However the unlimited recent requests table (recentRequests) is one of the
+ * simplifications.
+ */
+
 #ifndef __MEM_CACHE_PREFETCH_BEST_OFFSET_HH__
 #define __MEM_CACHE_PREFETCH_BEST_OFFSET_HH__
 

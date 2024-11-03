@@ -1,3 +1,13 @@
+/*
+ * Provided by the teachers of the course Computer Architecture (TDT4260) at
+ * Norwegian University of Science and Technology (NTNU), in 2024.
+ */
+
+/**
+ * @file
+ * Sceleton for a custom prefetcher header.
+ */
+
 #ifndef __MEM_CACHE_PREFETCH_TDT_PREFETCHER_HH__
 #define __MEM_CACHE_PREFETCH_TDT_PREFETCHER_HH__
 

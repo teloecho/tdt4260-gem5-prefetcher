@@ -1,3 +1,14 @@
+/*
+ * 2024 oystebw, teloecho
+ */
+
+/**
+ * @file
+ * Our implementation of a Best Offset Prefetcher following the paper of
+ * Pierre Michaud https://inria.hal.science/hal-01254863v1.
+ */
+
+
 #include "mem/cache/prefetch/best_offset.hh"
 
 //#include "mem/cache/replacement_policies/base.hh"

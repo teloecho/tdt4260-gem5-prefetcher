@@ -1,3 +1,11 @@
+# Sceleton provided by the teachers of the course Computer Architecture
+# (TDT4260) at Norwegian University of Science and Technology (NTNU), in 2024.
+# However heavily modified to fit our needs.
+
+# Defining the system configuration to be used for a simulation run. Some
+# prefetcher parameters can be set using commandline arguments, e.g. scoreMax,
+# roundMax, badScore and rrSize.
+
 import argparse
 import sys
 import os

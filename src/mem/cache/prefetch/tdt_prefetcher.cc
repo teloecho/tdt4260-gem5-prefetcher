@@ -1,3 +1,14 @@
+/*
+ * Provided by the teachers of the course Computer Architecture (TDT4260) at
+ * Norwegian University of Science and Technology (NTNU), in 2024.
+ */
+
+/**
+ * @file
+ * Example implementation for a custom prefetcher, implementing simple next
+ * line prefetching.
+ */
+
 #include "mem/cache/prefetch/tdt_prefetcher.hh"
 
 #include "debug/HWPrefetch.hh"
